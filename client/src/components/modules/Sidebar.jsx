@@ -25,12 +25,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     }
 
     if (currentMarker) {
-      currentMarker.remove(); // Remove old marker
+      currentMarker.remove();
     }
 
     const [lng, lat] = coordinates;
   
-    const newMarker = new mapboxgl.Marker({ color: "red" }) // Optional color
+    const newMarker = new mapboxgl.Marker({ color: "red" })
       .setLngLat(coordinates)
       .addTo(window.mapboxMap);
 
