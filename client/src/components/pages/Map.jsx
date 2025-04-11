@@ -19,6 +19,8 @@ const Map = () => {
       zoom: 15,
     });
 
+    window.mapboxMap = mapRef.current;
+    
     // Add geolocate control to the map.
     mapRef.current.addControl(
       new mapboxgl.GeolocateControl({
