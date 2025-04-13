@@ -1,12 +1,47 @@
 import React, { useState } from "react";
 import ActionBar from "./ActionBar";
 import Logo from "../../assets/MIT_logo.png";
+import mapboxgl from "mapbox-gl";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [selectedPage, setSelectedPage] = useState("home");
 
   const handlePageChange = (page) => {
     setSelectedPage(page);
+  };
+
+  const foodSpots = [
+    { name: "Simmons Dining", coordinates: [-71.10152, 42.35712] },
+    { name: "Forbes Family Cafe", coordinates: [-71.08992, 42.36173] },
+    { name: "Bleni", coordinates: [-71.09137, 42.35985] },
+  ];
+
+  const [currentMarker, setCurrentMarker] = useState(null);
+
+  const handleLocationClick = (coordinates) => {
+    if (!window.mapboxMap) {
+      console.error("Map not loaded yet");
+      return;
+    }
+
+    if (currentMarker) {
+      currentMarker.remove();
+    }
+
+    const [lng, lat] = coordinates;
+  
+    const newMarker = new mapboxgl.Marker({ color: "red" })
+      .setLngLat(coordinates)
+      .addTo(window.mapboxMap);
+
+    console.log("✅ New marker created:", newMarker);
+  
+    setCurrentMarker(newMarker);
+
+    window.mapboxMap.flyTo({
+      center: coordinates,
+      zoom: 16,
+    });
   };
 
   const renderContent = () => {
@@ -18,7 +53,20 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       case "add":
         return <p className="text-sm">Add new location</p>;
       case "dining":
-        return <p className="text-sm">Food</p>;
+        return (
+          <div className="flex flex-col space-y-2 text-sm">
+            <p className="text-sm">Dining Locations:</p>
+            {foodSpots.map((loc, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleLocationClick(loc.coordinates)}
+                className="text-left px-2 py-1 rounded hover:bg-gray-200"
+              >
+                {loc.name}
+              </button>
+            ))}
+          </div>
+        );
       case "classes":
         return <p className="text-sm">Classes</p>;
       case "profile":
