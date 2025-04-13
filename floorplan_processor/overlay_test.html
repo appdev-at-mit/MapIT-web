@@ -1,0 +1,49 @@
+<!--
+quickly thrown together leaflet demo
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+        <!-- Mapbox GL -->
+        <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' />
+        <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
+
+        <script src="https://unpkg.com/mapbox-gl-leaflet/leaflet-mapbox-gl.js"></script>
+    </head>
+    <body>
+        <div id="map" style="width:100%;height:100%"></div>
+        <script>
+            var token ="pk.eyJ1IjoiaGFpbGV5cGFuIiwiYSI6ImNtMmk1aTAzdTBqaXgya3EzczBuOTU0b3QifQ.Vfmnzm0EW8Z-3Dp3PhE8Aw";
+            var map = L.map('map', {
+
+            }).setView([42.3581282,-71.092586], 20);
+            var gl = L.mapboxGL({
+                accessToken: token,
+                style: 'mapbox://styles/mapbox/streets-v12'
+            }).addTo(map);
+
+            // add image overlay
+            let x = 42.35862;
+            let y = -71.09283;
+
+            let proj_pos = map.project(L.latLng(x, y), 20);
+
+            //L.marker([x, y]).addTo(map).bindPopup('This is a marker!').openPopup();
+            let imgUrl = 'floorplan.png';
+            let scl = 0.150;
+            let img_x_size = scl * 5809;
+            let img_y_size = scl * 6151;
+            let end_bounds = map.unproject([proj_pos.x+img_x_size, proj_pos.y+img_y_size], 20);
+            console.log(proj_pos, end_bounds);
+            let imgBounds = [[x, y], [end_bounds.lat, end_bounds.lng]]; // Adjust the bounds as needed
+            let imgOverlay = L.imageOverlay(imgUrl, imgBounds).addTo(map);
+        </script>
+    </body>
+</html>
