@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ActionBar from "./ActionBar";
 import Logo from "../../assets/MIT_logo.png";
 import mapboxgl from "mapbox-gl";
+import Classes from "./Classes";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [selectedPage, setSelectedPage] = useState("home");
@@ -68,7 +69,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </div>
         );
       case "classes":
-        return <p className="text-sm">Classes</p>;
+        return <Classes />;
       case "profile":
         return <p className="text-sm">Profile</p>;
       default:
