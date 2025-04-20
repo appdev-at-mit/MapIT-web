@@ -6,6 +6,7 @@ const Classes = () => {
     const [subjectID, setSubjectID] = useState(null);
 
     useEffect(() => {
+        // TODO Change to product API when done.
         fetch(`https://fireroad-dev.mit.edu/courses/lookup/${subjectID}?full=true
 `).then((response) => response.json()).then((classInfo) => {
             console.log('HERE');
@@ -19,24 +20,27 @@ const Classes = () => {
 
     function parseSchdule(scheduleStr) {
         const blocks = scheduleStr.split(';');
-        // TODO: fix regex
-        const re = /(?<section>\w+),(?<room>[\w-]+)\/(?<days>[\w-]+)\/(?<timeType>\d)\/(?<time>[\w-]+)/;
+        const timeBlockRe = /(?<room>[\w-]+)\/(?<days>[\w-]+)\/(?<timeType>\d)\/(?<time>[\w-]+)/;
         const roomRe = /(?<building>\d+)-(?<room>\d+)/;
 
         const newSchedules = []
 
         console.log(blocks.length);
         blocks.forEach((block) => {
-            const schedule = re.exec(block).groups;
-            const building = roomRe.exec(schedule.room).groups.building;
-
-            newSchedules.push({
-                type: schedule.section, 
-                building: building,
-                room: schedule.room, 
-                days: schedule.days,
-                time: schedule.time,
-            });
+            const allTime = block.split(',');
+            const sectionType = allTime[0];
+            for (const timeBlock of allTime.slice(1)) {
+                const schedule = timeBlockRe.exec(timeBlock).groups;
+                const building = roomRe.exec(schedule.room).groups.building;
+                
+                newSchedules.push({
+                    type: sectionType, 
+                    building: building,
+                    room: schedule.room, 
+                    days: schedule.days,
+                    time: schedule.time,
+                });
+            }
         })
 
         setSchedules(newSchedules);
@@ -49,7 +53,7 @@ const Classes = () => {
         setSubjectID(formData.get('subjectId'));
     }
 
-    return <div>
+    return <div className="overflow-y-scroll overscroll-contain">
         <p className="text-base">
             Search for: 
             <form onSubmit = {handleSubjectIDQuery}>
@@ -57,7 +61,7 @@ const Classes = () => {
                 <button type="submit"> Submit </button>
             </form>
         </p>
-        <p className="text-base">{subjectID}</p>         {/* TODO: change to variable */}
+        <p className="text-base">{subjectID}</p>
         <ul>
        {schedules.map((sectionInfo) => 
         <li>
