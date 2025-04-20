@@ -3,29 +3,34 @@ import React, { useEffect, useState } from "react";
 const Classes = () => {
     const [classInfo, setClassInfo] = useState('');
     const [schedules, setSchedules] = useState([]);
+    const [subjectID, setSubjectID] = useState(null);
 
     useEffect(() => {
-        fetch("https://fireroad-dev.mit.edu/courses/lookup/6.1200").then((response) => response.json()).then((classInfo) => {
+        fetch(`https://fireroad-dev.mit.edu/courses/lookup/${subjectID}?full=true
+`).then((response) => response.json()).then((classInfo) => {
             console.log('HERE');
             console.log(classInfo);
             const scheduleStr = classInfo['schedule'];
+            console.log(scheduleStr);
             parseSchdule(scheduleStr);
             setClassInfo(`${parseSchdule(scheduleStr)}`);
-        });
-    });
+        }).catch(() => {console.log(`NOT FOUND for ${subjectId}`)});
+    }, [subjectID]);
 
     function parseSchdule(scheduleStr) {
         const blocks = scheduleStr.split(';');
+        // TODO: fix regex
         const re = /(?<section>\w+),(?<room>[\w-]+)\/(?<days>[\w-]+)\/(?<timeType>\d)\/(?<time>[\w-]+)/;
         const roomRe = /(?<building>\d+)-(?<room>\d+)/;
 
+        const newSchedules = []
+
+        console.log(blocks.length);
         blocks.forEach((block) => {
-            // console.log(block);
-            // console.log(re.exec(block));
             const schedule = re.exec(block).groups;
             const building = roomRe.exec(schedule.room).groups.building;
-            // console.log(schedule.room);
-            schedules.push({
+
+            newSchedules.push({
                 type: schedule.section, 
                 building: building,
                 room: schedule.room, 
@@ -34,11 +39,25 @@ const Classes = () => {
             });
         })
 
-        setSchedules(schedules);
+        setSchedules(newSchedules);
+    }
+
+    function handleSubjectIDQuery (e) {
+        e.preventDefault(); // https://react.dev/reference/react-dom/components/input#reading-the-input-values-when-submitting-a-form
+        const form = e.target;
+        const formData = new FormData(form);
+        setSubjectID(formData.get('subjectId'));
     }
 
     return <div>
-        <p className="text-base">{6.1200}</p>         {/* TODO: change to variable */}
+        <p className="text-base">
+            Search for: 
+            <form onSubmit = {handleSubjectIDQuery}>
+                <input type= "text" name="subjectId" onInput={handleSubjectIDQuery}/>
+                <button type="submit"> Submit </button>
+            </form>
+        </p>
+        <p className="text-base">{subjectID}</p>         {/* TODO: change to variable */}
         <ul>
        {schedules.map((sectionInfo) => 
         <li>
