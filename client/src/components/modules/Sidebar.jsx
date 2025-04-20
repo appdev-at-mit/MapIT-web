@@ -23,6 +23,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         return <p className="text-sm">Classes</p>;
       case "profile":
         return <p className="text-sm">Profile</p>;
+      case "events":
+        return <p className="text-sm">Events</p>
       default:
         return <p className="text-sm">Welcome!</p>;
     }

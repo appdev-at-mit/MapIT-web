@@ -9,6 +9,7 @@ import {
   faUser,
   faChevronLeft,
   faChevronRight,
+  faCalendar
 } from "@fortawesome/free-solid-svg-icons";
 
 const ActionBar = ({ toggleSidebar, isOpen, onPageChange }) => {
@@ -44,8 +45,12 @@ const ActionBar = ({ toggleSidebar, isOpen, onPageChange }) => {
         className="w-8 h-8 text-gray-500 cursor-pointer"
         onClick={() => onPageChange("classes")}
       />
+      <FontAwesomeIcon
+        icon={faCalendar}
+        className="w-8 h-8 text-gray-500 cursor-pointer"
+        onClick={() => onPageChange("events")}
+      />
       <div className="w-full border-t border-gray-300 my-4"></div>
-
       <FontAwesomeIcon
         icon={isOpen ? faChevronLeft : faChevronRight}
         className="w-8 h-8 text-gray-500 cursor-pointer"
