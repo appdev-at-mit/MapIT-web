@@ -11,9 +11,19 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   };
 
   const foodSpots = [
-    { name: "Simmons Dining", coordinates: [-71.10152, 42.35712] },
+    { name: "Simmons Dining Hall", coordinates: [-71.10152, 42.35712] },
+    { name: "Maseeh Dining Hall", coordinates: [-71.09369, 42.35767] },
+    { name: "McCormick Dining Hall", coordinates: [-71.09470, 42.35713] },
+    { name: "Baker Dining Hall", coordinates: [-71.09557, 42.35686] },
+    { name: "Next Dining Hall", coordinates: [-71.10212, 42.35469] },
+    { name: "New Vassar Dining Hall", coordinates: [-71.09822, 42.35877] },
     { name: "Forbes Family Cafe", coordinates: [-71.08992, 42.36173] },
     { name: "Bleni", coordinates: [-71.09137, 42.35985] },
+    { name: "Cava", coordinates: [-71.08777, 42.36319] },
+    { name: "Vester", coordinates: [-71.08821, 42.36329] },
+    { name: "Starbucks", coordinates: [-71.08567, 42.36302] },
+    { name: "Flour Bakery + Cafe", coordinates: [-71.09669, 42.36103] },
+    { name: "Saloniki", coordinates: [-71.09599, 42.36099] },
   ];
 
   const [currentMarker, setCurrentMarker] = useState(null);
@@ -33,8 +43,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     const newMarker = new mapboxgl.Marker({ color: "red" })
       .setLngLat(coordinates)
       .addTo(window.mapboxMap);
-
-    console.log("✅ New marker created:", newMarker);
   
     setCurrentMarker(newMarker);
 
