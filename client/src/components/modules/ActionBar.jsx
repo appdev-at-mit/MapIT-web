@@ -6,6 +6,7 @@ import {
   faPlus,
   faUtensils,
   faBook,
+  faBookOpen,
   faUser,
   faChevronLeft,
   faChevronRight,
@@ -38,6 +39,11 @@ const ActionBar = ({ toggleSidebar, isOpen, onPageChange }) => {
         icon={faUtensils}
         className="w-8 h-8 text-gray-500 cursor-pointer"
         onClick={() => onPageChange("dining")}
+      />
+      <FontAwesomeIcon
+        icon={faBookOpen}
+        className="w-8 h-8 text-gray-500 cursor-pointer"
+        onClick={() => onPageChange("study")}
       />
       <FontAwesomeIcon
         icon={faBook}
