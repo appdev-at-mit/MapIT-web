@@ -20,7 +20,12 @@ export default defineConfig({
         target: 'http://localhost:3000',
         ws: true,
         changeOrigin: true,
-    },
+      },
+      '/api': {
+        target: 'https://dormsoup.mit.edu',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
     }
   }
 });

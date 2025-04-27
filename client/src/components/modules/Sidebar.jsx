@@ -5,12 +5,27 @@ import Logo from "../../assets/MIT_logo.png";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [events, setEvents] = useState([]);
-
+  const getEasternISOString = () => {
+    const now = new Date();
+    now.setHours(now.getHours() - 5); // subtract 5 hours for Eastern Time
+    return now.toISOString();
+  };
   useEffect(() => {
-    fetch("/events.json")
-      .then((res) => res.json())
-      .then((data) => setEvents(data))
-      .catch((err) => console.error("Failed to load events:", err));
+    const fetchEvents = () => {
+      const now = getEasternISOString();
+      const url = `/api/events?order=asc&since=${now}`;
+      console.log(url + " " + now)
+      fetch(url)
+        .then((res) => res.json())
+        .then((data) => setEvents(data))
+        .catch((err) => console.error("Failed to load events:", err));
+    };
+
+    fetchEvents(); // Initial fetch immediately
+
+    const intervalId = setInterval(fetchEvents, 5 * 60 * 1000); // 5 minutes
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
   }, []);
   const [selectedPage, setSelectedPage] = useState("home");
 
