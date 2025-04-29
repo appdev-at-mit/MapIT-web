@@ -1,21 +1,32 @@
 import React, { useEffect, useState } from "react";
 
 const Classes = () => {
-    const [classInfo, setClassInfo] = useState('');
+    const [haveSearched, setHaveSearched] = useState(false);
     const [schedules, setSchedules] = useState([]);
     const [subjectID, setSubjectID] = useState(null);
 
     useEffect(() => {
-        // TODO Change to product API when done.
-        fetch(`https://fireroad-dev.mit.edu/courses/lookup/${subjectID}?full=true
-`).then((response) => response.json()).then((classInfo) => {
-            console.log('HERE');
-            console.log(classInfo);
+        if (!subjectID){
+            return;
+        }
+
+        fetch(`https://fireroad-dev.mit.edu/courses/lookup/${subjectID}?full=true`)
+        .then((response) => {
+            if (response.ok) { return response.json(); }
+            else {throw new Error(`cannot retrieve class: response ${response.status}`)}
+        })
+        .then((classInfo) => {
+            if (!classInfo['schedule']) {
+                console.log(`Found ${subjectID}, but no schedule`);
+                setSchedules([]);
+                return;
+            }
             const scheduleStr = classInfo['schedule'];
-            console.log(scheduleStr);
             parseSchdule(scheduleStr);
-            setClassInfo(`${parseSchdule(scheduleStr)}`);
-        }).catch(() => {console.log(`NOT FOUND for ${subjectId}`)});
+        }).catch((e) => {
+            setSchedules(undefined);
+            console.log(`NOT FOUND for ${subjectID}`);
+        });
     }, [subjectID]);
 
     function parseSchdule(scheduleStr) {
@@ -25,7 +36,6 @@ const Classes = () => {
 
         const newSchedules = []
 
-        console.log(blocks.length);
         blocks.forEach((block) => {
             const allTime = block.split(',');
             const sectionType = allTime[0];
@@ -46,30 +56,62 @@ const Classes = () => {
         setSchedules(newSchedules);
     }
 
+    function displaySchedule() {
+        if (!haveSearched){
+            return '';
+        }
+
+        if (schedules === undefined) {
+            return 'Cannot find class';
+        } else if (schedules.length === undefined) {
+            return 'ERROR';
+        } else if (schedules.length === 0) {
+            return 'No Classes this semester';
+        } else {
+            return schedules.map((sectionInfo) => {
+                let bgColor = 'bg-gray-100';
+                switch(sectionInfo.type) {
+                    case "Lecture":
+                        bgColor = 'bg-green-200';
+                        break;
+                    case "Recitation":
+                        bgColor = 'bg-blue-200';
+                        break;
+                    case "Lab":
+                        bgColor = 'bg-purple-200';
+                        break;
+                    case "Design":
+                        bgColor = 'bg-pink-200';
+                        break;
+                }
+                return <li>
+                    <div className={`font-bold ${bgColor}`}>{sectionInfo.type}</div>
+                    {sectionInfo.room}<br />
+                    Meets on {sectionInfo.days} at {sectionInfo.time}<br />
+                </li>;
+                }
+            );
+        }
+    }
+
     function handleSubjectIDQuery (e) {
         e.preventDefault(); // https://react.dev/reference/react-dom/components/input#reading-the-input-values-when-submitting-a-form
+        setHaveSearched(true);
         const form = e.target;
         const formData = new FormData(form);
         setSubjectID(formData.get('subjectId'));
     }
 
-    return <div className="overflow-y-scroll overscroll-contain">
+    return <div className="overflow-scroll overscroll-contain">
         <p className="text-base">
-            Search for: 
-            <form onSubmit = {handleSubjectIDQuery}>
-                <input type= "text" name="subjectId" onInput={handleSubjectIDQuery}/>
-                <button type="submit"> Submit </button>
+            <form onSubmit = {handleSubjectIDQuery} className="w-100%">
+                <input type= "text" name="subjectId" className="bg-gray-200"/>
+                <button type="submit"> Search </button>
             </form>
         </p>
         <p className="text-base">{subjectID}</p>
         <ul>
-       {schedules.map((sectionInfo) => 
-        <li>
-            <div className="font-bold">{sectionInfo.type}</div>
-            {sectionInfo.room}<br />
-            Meets on {sectionInfo.days} at {sectionInfo.time}<br />
-        </li>
-       )}
+       { displaySchedule() }
        </ul>
     </div>;
 };
