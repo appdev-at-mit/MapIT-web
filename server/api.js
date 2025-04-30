@@ -126,6 +126,74 @@ router.post("/buildings/:buildingIdentifier/floors/:floorIdentifier/rooms", asyn
   }
 });
 
+// GET endpoint to search for a specific room (e.g., "1-136")
+router.get("/rooms/search/:query", async (req, res) => {
+  const { query } = req.params;
+
+  // Basic parsing: Expects format like "Building-RoomNumber" (e.g., "1-136", "W20-500")
+  // More robust parsing might be needed for different formats
+  const parts = query.split('-');
+  if (parts.length < 2) {
+    return res.status(400).send({ msg: "Invalid search query format. Expected format: Building-RoomNumber (e.g., 1-136)" });
+  }
+  
+  // Assume the last part is the room number, everything before is the building identifier
+  const roomNumberQuery = parts.pop();
+  const buildingIdentifierQuery = parts.join('-'); // Handle building identifiers with hyphens
+
+  if (!buildingIdentifierQuery || !roomNumberQuery) {
+     return res.status(400).send({ msg: "Invalid search query format after parsing." });
+  }
+
+  console.log(`Searching for Building: ${buildingIdentifierQuery}, Room: ${roomNumberQuery}`);
+
+  try {
+    // Use aggregation pipeline for efficient searching within nested arrays
+    const result = await Building.aggregate([
+      {
+        $match: { buildingIdentifier: buildingIdentifierQuery } // Match the building first
+      },
+      {
+        $unwind: "$floors" // Deconstruct the floors array
+      },
+      {
+        $unwind: "$floors.rooms" // Deconstruct the rooms array within each floor
+      },
+      {
+        // Match the specific room number within the unwound documents
+        // Use a case-insensitive match if needed: $match: { "floors.rooms.roomNumber": { $regex: new RegExp(`^${roomNumberQuery}$`, 'i') } }
+        $match: { "floors.rooms.roomNumber": roomNumberQuery }
+      },
+      {
+        // Project only the necessary fields for the result
+        $project: {
+          _id: 0, // Exclude default MongoDB ID
+          buildingIdentifier: "$buildingIdentifier",
+          buildingName: "$name",
+          floorId: "$floors.floorId",
+          floorName: "$floors.name",
+          roomNumber: "$floors.rooms.roomNumber",
+          location: "$floors.rooms.location.coordinates" // Extract [lng, lat] array
+        }
+      }
+    ]);
+
+    if (result.length > 0) {
+      // Found the room
+      console.log("Found room:", result[0]);
+      res.status(200).send(result[0]); // Send the first match (should ideally be unique)
+    } else {
+      // Room not found
+      console.log(`Room ${query} not found.`);
+      res.status(404).send({ msg: `Room ${query} not found.` });
+    }
+
+  } catch (error) {
+    console.error("Error searching for room:", error);
+    res.status(500).send({ msg: "Server error while searching for room.", error: error.message });
+  }
+});
+
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {
   console.log(`API route not found: ${req.method} ${req.url}`);

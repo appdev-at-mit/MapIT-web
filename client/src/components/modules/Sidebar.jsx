@@ -1,13 +1,52 @@
 import React, { useState } from "react";
 import ActionBar from "./ActionBar";
+import SearchComponent from "./SearchComponent";
 import Logo from "../../assets/MIT_logo.png";
 import mapboxgl from "mapbox-gl";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [selectedPage, setSelectedPage] = useState("home");
+  const [currentMarker, setCurrentMarker] = useState(null);
 
   const handlePageChange = (page) => {
     setSelectedPage(page);
+  };
+
+  const handleGoToLocation = (coordinates, popupText = null, zoom = 16) => {
+    const map = window.mapboxMap;
+    if (!map) {
+      console.error("Map not loaded yet");
+      return;
+    }
+
+    if (currentMarker) {
+      currentMarker.remove();
+    }
+
+    const newMarker = new mapboxgl.Marker({ color: "red" })
+      .setLngLat(coordinates)
+      .addTo(map);
+      
+    if (popupText) {
+        newMarker.setPopup(new mapboxgl.Popup({ offset: 25 }).setText(popupText));
+    }
+    
+    setCurrentMarker(newMarker);
+
+    map.flyTo({
+      center: coordinates,
+      zoom: zoom,
+    });
+  };
+  
+  const handleSearchResultSelect = (result) => {
+      if (result && result.location) {
+          const coordinates = result.location;
+          const popupText = `${result.buildingName ? `${result.buildingName} - ` : ''}${result.roomNumber} (${result.floorName})`;
+          handleGoToLocation(coordinates, popupText, 18);
+          
+          console.log("Need to switch map to floor:", result.floorId);
+      }
   };
 
   const foodSpots = [
@@ -47,36 +86,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     { name: "Tang Center (E51)", coordinates: [-71.08442846882926, 42.36063347573548] },
   ];
 
-  const [currentMarker, setCurrentMarker] = useState(null);
-
-  const handleLocationClick = (coordinates) => {
-    if (!window.mapboxMap) {
-      console.error("Map not loaded yet");
-      return;
-    }
-
-    if (currentMarker) {
-      currentMarker.remove();
-    }
-
-    const [lng, lat] = coordinates;
-  
-    const newMarker = new mapboxgl.Marker({ color: "red" })
-      .setLngLat(coordinates)
-      .addTo(window.mapboxMap);
-  
-    setCurrentMarker(newMarker);
-
-    window.mapboxMap.flyTo({
-      center: coordinates,
-      zoom: 16,
-    });
-  };
-
   const renderContent = () => {
     switch (selectedPage) {
       case "search":
-        return <p className="text-sm">Search</p>;
+        return <SearchComponent onSearchResultSelect={handleSearchResultSelect} />;
       case "bookmarks":
         return <p className="text-sm">Saved locations</p>;
       case "add":
@@ -88,7 +101,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             {foodSpots.map((loc, idx) => (
               <button
                 key={idx}
-                onClick={() => handleLocationClick(loc.coordinates)}
+                onClick={() => handleGoToLocation(loc.coordinates, loc.name)}
                 className="text-left px-2 py-1 rounded hover:bg-gray-200"
               >
                 {loc.name}
@@ -103,7 +116,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             {studySpots.map((loc, idx) => (
               <button
                 key={idx}
-                onClick={() => handleLocationClick(loc.coordinates)}
+                onClick={() => handleGoToLocation(loc.coordinates, loc.name)}
                 className="text-left px-2 py-1 rounded hover:bg-gray-200"
               >
                 {loc.name}
@@ -151,12 +164,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       style={{ zIndex: 10 }}
     >
       {isOpen && (
-        <div className="p-4 space-y-4 w-full">
-          <div className="flex flex-row space-x-4 border-b pb-4">
+        <div className="p-4 space-y-4 w-full flex flex-col h-full">
+          <div className="flex flex-row space-x-4 border-b pb-4 flex-shrink-0">
             <img src={Logo} className="h-8" alt="MIT Logo" />
             <h2 className="text-xl font-semibold">Campus Map</h2>
           </div>
-          {renderContent()}
+          <div className="flex-grow overflow-y-auto">
+            {renderContent()}
+          </div>
         </div>
       )}
 
