@@ -52,6 +52,33 @@ const Map = () => {
 
     mapRef.current.on("click", handleMapClick);
 
+    // add image overlay when map loads
+    mapRef.current.on('load', () => {
+      const imageUrl = '/floor_plans/1_0.png'; 
+      
+      const coordinates = [
+        [-71.09280847435501, 42.35834378834414], // Top-left corner
+        [-71.0921528451442, 42.358555201973275], // Top-right corner
+        [-71.09166243795372, 42.35795523299731], // Bottom-right corner
+        [-71.0924304232804, 42.35770468531794]  // Bottom-left corner
+      ];
+
+      mapRef.current.addSource('floorplan-1-source', {
+          type: 'image',
+          url: imageUrl,
+          coordinates: coordinates
+      });
+
+      mapRef.current.addLayer({
+          id: 'floorplan-1-layer',
+          type: 'raster',
+          source: 'floorplan-1-source',
+          paint: {
+              'raster-opacity': 0.85
+          }
+      });
+    });
+
     // Cleanup on unmount
     return () => {
       if (mapRef.current) {
