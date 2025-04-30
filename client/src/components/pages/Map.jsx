@@ -140,9 +140,28 @@ const Map = () => {
           popupRef.current = null;
       }
 
-      // Get the latest floor ID from the ref
+      // Get the latest floor ID from the ref (still useful for context)
       const latestFloorId = currentFloorIdRef.current;
 
+      // --- TEMP: Always add Lat/Lon marker --- H
+      console.log(`Clicked Coords: Lng: ${lng.toFixed(6)}, Lat: ${lat.toFixed(6)} (Floor Context: ${latestFloorId})`);
+
+      const newMarker = new mapboxgl.Marker()
+        .setLngLat([lng, lat])
+        .setPopup(
+          new mapboxgl.Popup({ offset: 25 }).setText(
+            // Display just the coordinates
+            `Lng: ${lng.toFixed(6)}, Lat: ${lat.toFixed(6)}`
+          )
+        )
+        .addTo(mapRef.current);
+
+      // Optional: Still save marker data if needed for cleanup or other purposes
+      // Using the original `markers` state name temporarily
+      setMarkers((prevMarkers) => [...prevMarkers, { lng, lat, floor: latestFloorId, marker: newMarker }]);
+      // --- END TEMP --- H
+
+      /* --- ORIGINAL FLOOR SWITCHING & ROOM MARKING LOGIC (Commented Out) --- H
       // Check if click is within building bounds
       if (isPointInBounds([lng, lat], buildingBounds)) {
         // Click is inside the building: Show floor selector popup
@@ -177,6 +196,25 @@ const Map = () => {
             popupRef.current = null;
          });
 
+         // Room prompt logic (also commented out)
+         /*
+         setTimeout(() => {
+           const roomNumber = window.prompt(`Enter room number for location on ${latestFloorId}:`);
+           if (roomNumber && roomNumber.trim() !== "") {
+             const roomName = roomNumber.trim();
+             console.log(`Saving room: ${roomName}, Floor: ${latestFloorId}, Lng: ${lng}, Lat: ${lat}`);
+             const roomMarker = new mapboxgl.Marker({ color: '#FF0000' })
+               .setLngLat([lng, lat])
+               .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(`Room: ${roomName} (${latestFloorId})`))
+               .addTo(mapRef.current);
+             const newLocation = { id: `room-${Date.now()}`, type: 'room', room: roomName, floor: latestFloorId, lng, lat, marker: roomMarker };
+             setSavedLocations(prevLocations => [...prevLocations, newLocation]);
+           } else {
+             console.log("Room marking cancelled.");
+           }
+         }, 50);
+         * /
+
       } else {
         // Click is outside the building: Add a marker (original behavior)
         console.log(`Clicked coordinates (Outside Building): Lng: ${lng}, Lat: ${lat}, Floor Context: ${latestFloorId}`);
@@ -184,7 +222,7 @@ const Map = () => {
           .setLngLat([lng, lat])
           .setPopup(
             new mapboxgl.Popup({ offset: 25 }).setText(
-              `Marker at Lng: ${lng.toFixed(6)}, Lat: ${lat.toFixed(6)}` // Removed floor info here, could add if needed
+              `Marker at Lng: ${lng.toFixed(6)}, Lat: ${lat.toFixed(6)}`
             )
           )
           .addTo(mapRef.current);
@@ -192,6 +230,7 @@ const Map = () => {
         // Still associate marker with the currently selected floor for potential saving
         setMarkers((prevMarkers) => [...prevMarkers, { lng, lat, floor: latestFloorId, marker: newMarker }]);
       }
+      */ // --- END ORIGINAL LOGIC --- H
     };
 
     mapRef.current.on("click", handleMapClick);
