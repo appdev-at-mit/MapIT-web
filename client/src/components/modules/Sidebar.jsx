@@ -26,6 +26,27 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     { name: "Saloniki", coordinates: [-71.09599, 42.36099] },
   ];
 
+  const studySpots = [
+    { name: "Stratton Student Center", coordinates: [-71.09476535644784, 42.35903326696096] },
+    { name: "Hayden Library", coordinates: [-71.08937529538572, 42.35896647619004] },
+    { name: "Stata Center", coordinates: [-71.09072556223546, 42.36173658007837] },
+    { name: "Barker Engineering Library", coordinates: [-71.09203912932843, 42.35977356745832] },
+    { name: "Dewey Library", coordinates: [-71.08373000634627, 42.36128553075362] },
+    { name: "Lewis Music Library", coordinates: [-71.08899450929553, 42.35929377367246] },
+    { name: "Rotch Library", coordinates: [-71.09321532180071, 42.35947949282156] },
+    { name: "Green Building", coordinates: [-71.08931623843961, 42.36030738139383] },
+    { name: "DUSP (Building 9)", coordinates: [-71.09373843274399, 42.35976734675243] },
+    { name: "MIT.nano (Building 12)", coordinates: [-71.09153376123022, 42.36016203224441] },
+    { name: "Brain and Cognitive Sciences (Building 46)", coordinates: [-71.09174171732207, 42.362015719981414] },
+    { name: "Building 66", coordinates: [-71.08909392982532, 42.36088503920603] },
+    { name: "iHQ (E38 Floor 3)", coordinates: [-71.08582332989639, 42.36214017769601] },
+    { name: "STEAM (Building 7 Floor 4)", coordinates: [-71.09321701983852, 42.35931027407876] },
+    { name: "Cheney Room (3-308)", coordinates: [-71.09246413230488, 42.3589617517468] },
+    { name: "Banana Lounge", coordinates: [-71.09113521872786, 42.36063637099156] },
+    { name: "Martin Trust Center (E40)", coordinates: [-71.08480396721305, 42.36109872321201] },
+    { name: "Tang Center (E51)", coordinates: [-71.08442846882926, 42.36063347573548] },
+  ];
+
   const [currentMarker, setCurrentMarker] = useState(null);
 
   const handleLocationClick = (coordinates) => {
@@ -65,6 +86,21 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <div className="flex flex-col space-y-2 text-sm">
             <p className="text-sm">Dining Locations:</p>
             {foodSpots.map((loc, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleLocationClick(loc.coordinates)}
+                className="text-left px-2 py-1 rounded hover:bg-gray-200"
+              >
+                {loc.name}
+              </button>
+            ))}
+          </div>
+        );
+      case "study":
+        return (
+          <div className="flex flex-col space-y-2 text-sm">
+            <p className="text-sm">Study Spots:</p>
+            {studySpots.map((loc, idx) => (
               <button
                 key={idx}
                 onClick={() => handleLocationClick(loc.coordinates)}
