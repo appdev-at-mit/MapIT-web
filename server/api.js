@@ -279,7 +279,8 @@ router.get("/class", (req, res) => {
       res.status(404).send({ msg: 'Class not found'});
   } 
 
-  fetch(`https://fireroad-dev.mit.edu/courses/lookup/${searchText}?full=true`)
+  const baseUrl = process.env.FIREROAD_API;
+  fetch(`https://${baseUrl}/courses/lookup/${searchText}?full=true`)
   .then((response) => {
       if (response.ok) { return response.json(); }
       else {throw new Error(`cannot retrieve class: response ${response.status}`)}
