@@ -6,9 +6,11 @@ import {
   faPlus,
   faUtensils,
   faBook,
+  faBookOpen,
   faUser,
   faChevronLeft,
   faChevronRight,
+  faInfoCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
 const ActionBar = ({ toggleSidebar, isOpen, onPageChange }) => {
@@ -40,9 +42,19 @@ const ActionBar = ({ toggleSidebar, isOpen, onPageChange }) => {
         onClick={() => onPageChange("dining")}
       />
       <FontAwesomeIcon
+        icon={faBookOpen}
+        className="w-8 h-8 text-gray-500 cursor-pointer"
+        onClick={() => onPageChange("study")}
+      />
+      <FontAwesomeIcon
         icon={faBook}
         className="w-8 h-8 text-gray-500 cursor-pointer"
         onClick={() => onPageChange("classes")}
+      />
+      <FontAwesomeIcon
+        icon={faInfoCircle}
+        className="w-8 h-8 text-gray-500 cursor-pointer"
+        onClick={() => onPageChange("about")}
       />
       <div className="w-full border-t border-gray-300 my-4"></div>
 

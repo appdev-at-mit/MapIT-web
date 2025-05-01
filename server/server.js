@@ -21,7 +21,7 @@ validator.checkSetup();
 //allow us to use process.ENV
 require("dotenv").config();
 
-//import libraries needed for the webserver to work!
+//import libraries needed for the webserver to work
 const http = require("http");
 const express = require("express"); // backend framework for our node server.
 const session = require("express-session"); // library that stores info about each connected user
@@ -35,9 +35,7 @@ const auth = require("./auth");
 const socketManager = require("./server-socket");
 
 // Server configuration below
-// TODO change connection URL after setting up your team database
 const mongoConnectionURL = process.env.MONGO_SRV;
-// TODO change database name to the name you chose
 const databaseName = "Cluster0";
 
 // mongoose 7 warning
