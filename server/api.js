@@ -15,6 +15,7 @@ const Building = require("./models/Building");
 
 // import authentication library
 const auth = require("./auth");
+// const { get } = require("../../client/src/utilities"); // REMOVED: Cannot require client modules on server
 
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
@@ -43,6 +44,19 @@ router.post("/initsocket", (req, res) => {
 // |------------------------------|
 // | write your API methods below!|
 // |------------------------------|
+
+// GET endpoint to retrieve all building data
+router.get("/buildings", async (req, res) => {
+  try {
+    // Fetch all buildings and populate necessary details
+    // Exclude large fields like room data if not needed for initial map load
+    const buildings = await Building.find({}).select("buildingIdentifier name floors.floorId floors.name floors.imageUrl floors.cornerCoordinates"); 
+    res.status(200).send(buildings);
+  } catch (error) {
+    console.error("Error fetching buildings:", error);
+    res.status(500).send({ msg: "Server error while fetching building data.", error: error.message });
+  }
+});
 
 // POST endpoint to add/update rooms for a specific floor in a building
 router.post("/buildings/:buildingIdentifier/floors/:floorIdentifier/rooms", async (req, res) => {
@@ -191,6 +205,62 @@ router.get("/rooms/search/:query", async (req, res) => {
   } catch (error) {
     console.error("Error searching for room:", error);
     res.status(500).send({ msg: "Server error while searching for room.", error: error.message });
+  }
+});
+
+// PUT endpoint to update details of a specific floor
+router.put("/buildings/:buildingIdentifier/floors/:floorIdentifier/details", async (req, res) => {
+  const { buildingIdentifier, floorIdentifier } = req.params;
+  const { cornerCoordinates, imageUrl, name } = req.body; // Fields that can be updated
+
+  // Basic validation on coordinates if provided
+  if (cornerCoordinates) {
+    if (!Array.isArray(cornerCoordinates) || cornerCoordinates.length !== 4 || 
+        !cornerCoordinates.every(coord => Array.isArray(coord) && coord.length === 2 && typeof coord[0] === 'number' && typeof coord[1] === 'number')) {
+      return res.status(400).send({ msg: "Invalid cornerCoordinates format. Expected Array[[lng, lat], [lng, lat], [lng, lat], [lng, lat]]." });
+    }
+  }
+
+  try {
+    const building = await Building.findOne({ buildingIdentifier: buildingIdentifier });
+
+    if (!building) {
+      return res.status(404).send({ msg: `Building ${buildingIdentifier} not found.` });
+    }
+
+    // Find the index of the floor to update
+    const floorIndex = building.floors.findIndex(f => f.floorId === floorIdentifier);
+
+    if (floorIndex === -1) {
+      return res.status(404).send({ msg: `Floor ${floorIdentifier} not found in Building ${buildingIdentifier}.` });
+    }
+
+    // Update allowed fields
+    let updated = false;
+    if (cornerCoordinates) {
+      building.floors[floorIndex].cornerCoordinates = cornerCoordinates;
+      updated = true;
+    }
+    if (imageUrl) {
+      building.floors[floorIndex].imageUrl = imageUrl;
+       updated = true;
+    }
+     if (name) {
+      building.floors[floorIndex].name = name;
+       updated = true;
+    }
+    
+    if (!updated) {
+        return res.status(400).send({ msg: "No valid fields provided for update (allowed: name, cornerCoordinates, imageUrl)." });
+    }
+
+    await building.save();
+    console.log(`Updated details for Floor ${floorIdentifier} in Building ${buildingIdentifier}`);
+    res.status(200).send(building.floors[floorIndex]); // Return updated floor
+
+  } catch (error) {
+    console.error(`Error updating floor details for ${buildingIdentifier}/${floorIdentifier}:`, error);
+    res.status(500).send({ msg: "Server error while updating floor details.", error: error.message });
   }
 });
 

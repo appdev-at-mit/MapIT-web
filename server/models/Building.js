@@ -22,11 +22,18 @@ const RoomSchema = new Schema({
 
 // Schema for individual floors within a building
 const FloorSchema = new Schema({
-  floorId: { type: String, required: true, unique: true }, // e.g., 'floor-0', 'floor-1'
+  // floorId does NOT need to be unique across the entire collection, only within a building
+  floorId: { type: String, required: true }, // e.g., 'floor-0', 'floor-1'
   name: { type: String, required: true }, // e.g., 'Floor 1', 'Basement'
   // Array of embedded room documents
   rooms: [RoomSchema],
-  // Add other floor-specific properties if needed (e.g., floor plan image URL?)
+  // Coordinates for the four corners of the floor plan image overlay
+  // Format: [[lng, lat], [lng, lat], [lng, lat], [lng, lat]] (e.g., TopLeft, TopRight, BottomRight, BottomLeft)
+  cornerCoordinates: {
+     type: [[Number]], // Array of arrays of numbers
+     required: false // Make optional for now, can be added later
+  },
+  imageUrl: { type: String, required: false } // Optional: Store image URL here too
 });
 
 // Schema for buildings
