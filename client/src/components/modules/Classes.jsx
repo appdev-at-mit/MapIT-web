@@ -1,30 +1,26 @@
 import React, { useEffect, useState } from "react";
+import axios from 'axios';
 
 const Classes = () => {
     const [haveSearched, setHaveSearched] = useState(false);
     const [schedules, setSchedules] = useState([]);
     const [subjectID, setSubjectID] = useState(null);
 
+    
     useEffect(() => {
         if (!subjectID){
             return;
         }
 
-        fetch(`https://fireroad-dev.mit.edu/courses/lookup/${subjectID}?full=true`)
-        .then((response) => {
-            if (response.ok) { return response.json(); }
-            else {throw new Error(`cannot retrieve class: response ${response.status}`)}
-        })
-        .then((classInfo) => {
-            if (!classInfo['schedule']) {
-                console.log(`Found ${subjectID}, but no schedule`);
-                setSchedules([]);
-                return;
-            }
-            const scheduleStr = classInfo['schedule'];
-            parseSchdule(scheduleStr);
+        axios.get(`/api/class`, {params: {subjectId: subjectID}})
+        .then((res) => {
+            console.log(res);
+            const schedule = res.data.schedule;
+            console.log(schedule);
+            parseSchdule(schedule);
         }).catch((e) => {
             setSchedules(undefined);
+            console.log(e);
             console.log(`NOT FOUND for ${subjectID}`);
         });
     }, [subjectID]);
