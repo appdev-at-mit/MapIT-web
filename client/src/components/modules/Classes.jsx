@@ -4,6 +4,7 @@ const Classes = () => {
     const [haveSearched, setHaveSearched] = useState(false);
     const [schedules, setSchedules] = useState([]);
     const [subjectID, setSubjectID] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (!subjectID){
@@ -56,19 +57,31 @@ const Classes = () => {
         setSchedules(newSchedules);
     }
 
+
+
     function displaySchedule() {
         if (!haveSearched){
             return '';
         }
 
+        const style = "text-base pt-2 pb-2"
+        const header = <p className={style}>Subject Found: {subjectID}</p>
+
         if (schedules === undefined) {
-            return 'Cannot find class';
+            return <div className={style}>
+                { 'Cannot find class' }
+            </div>;
         } else if (schedules.length === undefined) {
-            return 'ERROR';
+            return <div className={style}>
+                { 'ERROR' }
+            </div>;
         } else if (schedules.length === 0) {
-            return 'No Classes this semester';
+            return <div>
+                {header}
+                { 'No Classes this semester' }
+            </div>;
         } else {
-            return schedules.map((sectionInfo) => {
+            const list = schedules.map((sectionInfo) => {
                 let bgColor = 'bg-gray-100';
                 switch(sectionInfo.type) {
                     case "Lecture":
@@ -84,13 +97,15 @@ const Classes = () => {
                         bgColor = 'bg-pink-200';
                         break;
                 }
-                return <li>
-                    <div className={`font-bold ${bgColor}`}>{sectionInfo.type}</div>
-                    {sectionInfo.room}<br />
+                return <li className="border rounded mt-2 mb-2">
+                    <div className={`font-bold ${bgColor} pl-2`}>{sectionInfo.type}</div>
+                    <p className="p-1">{sectionInfo.room}<br />
                     Meets on {sectionInfo.days} at {sectionInfo.time}<br />
+                    </p>
                 </li>;
                 }
             );
+            return <ul>{list}</ul>
         }
     }
 
@@ -102,17 +117,16 @@ const Classes = () => {
         setSubjectID(formData.get('subjectId'));
     }
 
-    return <div className="overflow-scroll overscroll-contain">
-        <p className="text-base">
-            <form onSubmit = {handleSubjectIDQuery} className="w-100%">
-                <input type= "text" name="subjectId" className="bg-gray-200"/>
-                <button type="submit"> Search </button>
+    return <div>
+        <p className="text-base flex">
+            <form onSubmit = {handleSubjectIDQuery} className="w-full">
+                <input type= "text" name="subjectId" className="p-2 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"/>
+                <button type="submit" className="h-full border rounded"> Search </button>
             </form>
         </p>
-        <p className="text-base">{subjectID}</p>
-        <ul>
-       { displaySchedule() }
-       </ul>
+        <div className="overflow-scroll">
+            { displaySchedule() }
+       </div>
     </div>;
 };
 
