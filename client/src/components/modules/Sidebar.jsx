@@ -157,7 +157,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <div
-      className={`bg-white text-black transition-all duration-300 ease-in-out fixed top-0 left-0 h-full pr-3 ${
+      className={`bg-white text-black transition-all duration-300 ease-in-out fixed top-0 left-0 h-full pr-3 shadow-appdev-purple shadow-lg ${
         isOpen ? "w-64" : "w-14"
       } flex flex-col items-center shadow-lg`}
       style={{ zIndex: 10 }}
