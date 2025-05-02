@@ -1,17 +1,21 @@
 import cv2
 
-# import pytesseract
+import pytesseract
 import numpy as np
 import pdf2image
 from pdf2image import convert_from_path
+import os
+from tqdm import tqdm
 
 FLOORPLAN_CONTOUR_INDEX = 0
 HEADING_CONTOUR_INDEX = 6
 
 HEADING_INDICATOR_CENTER = (228, 192)
 
-RED = (0, 0, 200, 255)
+# RED = (0, 0, 200, 255)
+BLACK = (0, 0, 0, 255)
 
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 def render_pdf(pdf_path):
     """
@@ -74,11 +78,17 @@ def extract_text_from_image(image):
     # Convert the image to RGB (Tesseract requires RGB format)
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    # Use Tesseract to extract text
-    extracted_text = pytesseract.image_to_string(image_rgb)
+    # # Use Tesseract to extract text
+    # extracted_text = pytesseract.image_to_string(image_rgb)
 
-    return extracted_text
-
+    # return extracted_text
+    data = pytesseract.image_to_data(image_rgb, output_type='dict')
+    boxes = len(data['level'])
+    for i in range(boxes ):
+        (x, y, w, h) = (data['left'][i], data['top'][i], data['width'][i], data['height'][i])
+        #Draw box        
+        cv2.rectangle(image_rgb, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    return image_rgb
 
 def extract_outer_rect_contour(image):
     """
@@ -123,6 +133,8 @@ def extract_building_contour(image):
     contours = sorted(contours, key=cv2.contourArea, reverse=True)
     for contour in contours:
         if cv2.contourArea(contour) > 1000:
+            contour = fix_contour(contour, image)
+
             mask = np.zeros(image.shape, dtype=np.uint8)
             cv2.drawContours(mask, [contour], -1, (255, 255, 255, 255), -1)
             mask = cv2.bitwise_and(image, mask)
@@ -133,11 +145,86 @@ def extract_building_contour(image):
             kernel = np.ones((3, 3), np.uint8)
             cropped = cv2.erode(cropped, kernel, iterations=1)
             black_mask = cv2.inRange(cropped, (0, 0, 0, 255), (200, 200, 200, 255))
-            cropped[black_mask > 0] = RED
+            cropped[black_mask > 0] = BLACK
 
             return cropped
     return None
 
+
+def fix_contour(contour, img):
+    # walk along contour and run a pseudo convex hull with threshold
+    # take the convex hull, and figure out where to break it
+    # metric: distance / number of points skipped, lower metric better
+    # print("Contour: ", contour)
+    hull = cv2.convexHull(contour, returnPoints=False)
+    # print("Hull: ", hull)
+    try:
+        defects = cv2.convexityDefects(contour, hull)
+    except:
+        print("WARNING: convexity defect detection failed, self intersection?")
+        return contour
+    # print("Defects: ", defects)
+    defects_dict = {
+        defect[0][0]: (defect[0][0], defect[0][1], defect[0][2], defect[0][3]) for defect in defects
+    } if defects is not None else {}
+
+    cur = 0
+    fixed_contour = []
+    while cur < len(contour):
+        fixed_contour.append([contour[cur][0]])
+        if cur in defects_dict:
+            s, e, f, depth = defects_dict[cur]
+            delta = contour[s][0] - contour[e][0]
+            distance = delta[0] ** 2 + delta[1] ** 2
+            distance = np.sqrt(distance)
+            if distance < 10:
+                cur += 1
+                continue
+            print(contour[s][0], contour[e][0])
+            depth /= 256.0
+            perim = cv2.arcLength(contour[s:e], False)
+            area = cv2.contourArea(contour[s:e] + contour[s])
+            cv2.drawContours(img, [contour[s:e] + contour[s]], -1, (0, 255, 0, 255), 3)
+            metric = distance / area
+            #print("Distance:", distance, "Perim:", perim)
+            print(metric)
+            if metric < 0.1:
+                cur = e
+            else:
+                cur += 1
+        else:
+            cur += 1
+    #img = cv2.resize(img, (0, 0), fx=0.2, fy=0.2)
+    cv2.imshow("contour", img)
+    cv2.imwrite("contour.png", img)
+    cv2.waitKey(0)
+    fixed_contour = np.array(fixed_contour)
+    return fixed_contour
+
+    # if len(defects) == 0:
+    #     return contour
+    # fixed_contour = []
+    # last_end = None
+    # first_start = None
+    # for i in range(defects.shape[0]):
+    #     s, e, f, d = defects[i][0]
+    #     metric = d / (e - s)
+    #     if metric > 0.1:
+    #         continue
+    #     if first_start is None:
+    #         first_start = s
+    #     if last_end is not None:
+    #         for j in range(last_end, s):
+    #             fixed_contour.append(contour[j][0])
+    #     fixed_contour.append(contour[s][0])
+    #     last_end = e
+    # if last_end is not None:
+    #     for j in range(last_end, len(contour)):
+    #         fixed_contour.append(contour[j][0])
+    # if first_start is not None:
+    #     for j in range(first_start):
+    #         fixed_contour.append(contour[j][0])
+    # fixed_contour = np.array(fixed_contour)
 
 def rotate_image(mat, angle):
     """
@@ -170,24 +257,47 @@ def rotate_image(mat, angle):
     rotated_mat = cv2.warpAffine(mat, rotation_mat, (bound_w, bound_h))
     return rotated_mat
 
+def run_file(fname):
+    img = render_pdf(fname)[0]
+    img = np.array(img)
+    sections = extract_outer_rect_contour(img)
+    floorplan = extract_building_contour(sections[FLOORPLAN_CONTOUR_INDEX])
+    # heading = extract_heading(sections[HEADING_CONTOUR_INDEX])
+    # floorplan = rotate_image(floorplan, 90 - heading)
+    # print("Heading:", heading)
+    print("contours/" + fname.split(".")[0].split("/")[1] + ".png")
+    cv2.imwrite("contours/" + fname.split(".")[0].split("/")[1] + ".png", floorplan)
+    # cv2.imwrite("heading_img.png", sections[HEADING_CONTOUR_INDEX])
+    # cv2.waitKey(0)
 
-img = render_pdf("1_1.pdf")[0]
-img = np.array(img)
-sections = extract_outer_rect_contour(img)
+for fname in tqdm(os.listdir("floorplans")):
+    if fname.endswith(".pdf"):
+        run_file("floorplans/" + fname)
 
-floorplan = extract_building_contour(sections[FLOORPLAN_CONTOUR_INDEX])
+run_file("floorplans/13_4.pdf")
 
-cv2.imshow("floorplan", cv2.resize(floorplan, (0, 0), fx=0.5, fy=0.5))
-cv2.imshow(
-    "heading_box", cv2.resize(sections[HEADING_CONTOUR_INDEX], (0, 0), fx=0.5, fy=0.5)
-)
+# if __name__ == "__main__":
+#     img = render_pdf("1_1.pdf")[0]
+#     img = np.array(img)
+#     sections = extract_outer_rect_contour(img)
 
-# text = extract_text_from_image(sections[FLOORPLAN_CONTOUR_INDEX])
-# print("Text: ", text)
+#     floorplan = extract_building_contour(sections[FLOORPLAN_CONTOUR_INDEX])
 
-heading = extract_heading(sections[HEADING_CONTOUR_INDEX])
-floorplan = rotate_image(floorplan, 90 - heading)
-print("Heading:", heading)
-cv2.imwrite("floorplan.png", floorplan)
-cv2.imwrite("heading_img.png", sections[HEADING_CONTOUR_INDEX])
-cv2.waitKey(0)
+#     cv2.imshow("floorplan", cv2.resize(floorplan, (0, 0), fx=0.5, fy=0.5))
+#     cv2.imshow(
+#         "heading_box", cv2.resize(sections[HEADING_CONTOUR_INDEX], (0, 0), fx=0.5, fy=0.5)
+#     )
+
+#     # text = extract_text_from_image(sections[FLOORPLAN_CONTOUR_INDEX])
+#     # print("Text: ", text)
+
+#     img_text = extract_text_from_image(sections[FLOORPLAN_CONTOUR_INDEX])
+#     cv2.imshow("img_text", img_text)
+#     cv2.imwrite("img_text.png", img_text)
+
+#     heading = extract_heading(sections[HEADING_CONTOUR_INDEX])
+#     floorplan = rotate_image(floorplan, 90 - heading)
+#     print("Heading:", heading)
+#     cv2.imwrite("floorplan.png", floorplan)
+#     cv2.imwrite("heading_img.png", sections[HEADING_CONTOUR_INDEX])
+#     cv2.waitKey(0)
