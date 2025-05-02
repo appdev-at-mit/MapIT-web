@@ -3,6 +3,7 @@ import ActionBar from "./ActionBar";
 import SearchComponent from "./SearchComponent";
 import Logo from "../../assets/mapit_logo.png";
 import mapboxgl from "mapbox-gl";
+import Classes from "./Classes";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [selectedPage, setSelectedPage] = useState("about");
@@ -125,7 +126,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </div>
         );
       case "classes":
-        return <p className="text-sm">Classes</p>;
+        return <Classes onSectionSelect={handleSearchResultSelect}/>;
       case "profile":
         return <p className="text-sm">Profile</p>;
       case "about":
