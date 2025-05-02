@@ -201,7 +201,7 @@ const Map = () => {
     if (!mapRef.current) {
         const map = new mapboxgl.Map({
             container: mapContainerRef.current,
-            style: "mapbox://styles/mapbox/streets-v12",
+            style: "mapbox://styles/jieruei/cma66vw7o002v01sb57tg3qdo",
             center: [-71.0915, 42.3586],
             zoom: 16.5,
         });

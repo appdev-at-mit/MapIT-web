@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import ActionBar from "./ActionBar";
 import SearchComponent from "./SearchComponent";
-import Logo from "../../assets/MIT_logo.png";
+import Logo from "../../assets/mapit_logo.png";
 import mapboxgl from "mapbox-gl";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-  const [selectedPage, setSelectedPage] = useState("home");
+  const [selectedPage, setSelectedPage] = useState("about");
   const [currentMarker, setCurrentMarker] = useState(null);
 
   const handlePageChange = (page) => {
@@ -102,7 +102,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <button
                 key={idx}
                 onClick={() => handleGoToLocation(loc.coordinates, loc.name)}
-                className="text-left px-2 py-1 rounded hover:bg-gray-200"
+                className="text-left px-2 py-1 rounded border border-gray-300 hover:bg-appdev-purple hover:border-appdev-purple hover:text-white"
               >
                 {loc.name}
               </button>
@@ -117,7 +117,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <button
                 key={idx}
                 onClick={() => handleGoToLocation(loc.coordinates, loc.name)}
-                className="text-left px-2 py-1 rounded hover:bg-gray-200"
+                className="text-left px-2 py-1 rounded border border-gray-300 hover:bg-appdev-purple hover:border-appdev-purple hover:text-white"
               >
                 {loc.name}
               </button>
@@ -131,23 +131,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       case "about":
         return (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">About MapIT</h3>
+            <h3 className="text-lg font-semibold">Hello!</h3>
             <p className="text-sm">
               MapIT is a comprehensive campus navigation tool designed to help you explore and discover MIT's campus with ease.
+              Here, you can:
             </p>
             <div className="space-y-2">
-              <h4 className="text-md font-medium">Features:</h4>
               <ul className="list-disc list-inside text-sm space-y-1">
-                <li>Interactive campus map</li>
-                <li>Search for buildings and locations</li>
-                <li>Find dining options</li>
+                <li>Find buildings and classrooms</li>
+                <li>Explore dining options</li>
                 <li>Locate classrooms</li>
                 <li>Save your favorite spots</li>
                 <li>Add new locations</li>
               </ul>
             </div>
-            <p className="text-sm mt-4">
-              Built by AppDev @ MIT for MIT students, MapIT aims to make campus navigation intuitive and efficient.
+            <p className="text-sm mt-4 text-appdev-blue">
+              Built by AppDev@MIT for MIT students, MapIT aims to make campus navigation intuitive and efficient.
             </p>
           </div>
         );
@@ -158,7 +157,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <div
-      className={`bg-white text-black transition-all duration-300 ease-in-out fixed top-0 left-0 h-full ${
+      className={`bg-white text-black transition-all duration-300 ease-in-out fixed top-0 left-0 h-full pr-3 ${
         isOpen ? "w-64" : "w-14"
       } flex flex-col items-center shadow-lg`}
       style={{ zIndex: 10 }}
@@ -166,8 +165,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       {isOpen && (
         <div className="p-4 space-y-4 w-full flex flex-col h-full">
           <div className="flex flex-row space-x-4 border-b pb-4 flex-shrink-0">
-            <img src={Logo} className="h-8" alt="MIT Logo" />
-            <h2 className="text-xl font-semibold">Campus Map</h2>
+            <img src={Logo} className="h-12" alt="MapIT Logo" />
           </div>
           <div className="flex-grow overflow-y-auto">
           {renderContent()}
@@ -175,7 +173,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         </div>
       )}
 
-      <div className="absolute top-1/2 -right-4 transform -translate-y-1/2">
+      <div className="absolute top-1/2 -right-5 transform -translate-y-1/2">
         <ActionBar
           toggleSidebar={toggleSidebar}
           isOpen={isOpen}
