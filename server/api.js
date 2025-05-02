@@ -264,11 +264,6 @@ router.put("/buildings/:buildingIdentifier/floors/:floorIdentifier/details", asy
   }
 });
 
-router.get("/test", (req, res) => {
-  console.debug('HERE');
-  return res.status(200).json({msg: 'ok'});
-});
-
 router.get("/class", (req, res) => {
 
   const searchText = req.query.subjectId;
@@ -279,7 +274,7 @@ router.get("/class", (req, res) => {
       res.status(404).send({ msg: 'Class not found'});
   } 
 
-  const baseUrl = "fireroad.mit.edu";
+  const baseUrl = "fireroad-dev.mit.edu";
   fetch(`https://${baseUrl}/courses/lookup/${searchText}?full=true`)
   .then((response) => {
       if (response.ok) { return response.json(); }

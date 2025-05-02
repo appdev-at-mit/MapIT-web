@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from 'axios';
+import { get } from "../../utilities";
 
 const Classes = ({ onSectionSelect }) => {
     const [haveSearched, setHaveSearched] = useState(false);
@@ -12,9 +12,9 @@ const Classes = ({ onSectionSelect }) => {
         if (!subjectID){
             return;
         }
-        axios.get(`/api/class`, {params: {subjectId: subjectID}})
+        get(`/api/class`, {subjectId: subjectID})
         .then((res) => {
-            const schedule = res.data.schedule;
+            const schedule = res.schedule;
             parseSchdule(schedule);
         }).catch((e) => {
             setSchedules(undefined);
@@ -31,9 +31,9 @@ const Classes = ({ onSectionSelect }) => {
 
         const searchQuery = `${room.building}-${room.roomNumber}`;
 
-        axios.get(`/api/rooms/search/${encodeURIComponent(searchQuery)}`)
+        get(`/api/rooms/search/${encodeURIComponent(searchQuery)}`)
         .then((result) => {
-            onSectionSelect(result.data);
+            onSectionSelect(result);
         })
         .catch((e) => {
             console.error('Search failed');
