@@ -279,7 +279,7 @@ router.get("/class", (req, res) => {
       res.status(404).send({ msg: 'Class not found'});
   } 
 
-  const baseUrl = process.env.FIREROAD_API;
+  const baseUrl = "fireroad.mit.edu";
   fetch(`https://${baseUrl}/courses/lookup/${searchText}?full=true`)
   .then((response) => {
       if (response.ok) { return response.json(); }
