@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ActionBar from "./ActionBar";
 import SearchComponent from "./SearchComponent";
-import Logo from "../../assets/MIT_logo.png";
+import Logo from "../../assets/mapit_logo.png";
 import mapboxgl from "mapbox-gl";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
@@ -102,7 +102,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <button
                 key={idx}
                 onClick={() => handleGoToLocation(loc.coordinates, loc.name)}
-                className="text-left px-2 py-1 rounded hover:bg-gray-200"
+                className="text-left px-2 py-1 rounded border border-gray-300 hover:bg-appdev-purple hover:border-appdev-purple hover:text-white"
               >
                 {loc.name}
               </button>
@@ -117,7 +117,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               <button
                 key={idx}
                 onClick={() => handleGoToLocation(loc.coordinates, loc.name)}
-                className="text-left px-2 py-1 rounded hover:bg-gray-200"
+                className="text-left px-2 py-1 rounded border border-gray-300 hover:bg-appdev-purple hover:border-appdev-purple hover:text-white"
               >
                 {loc.name}
               </button>
@@ -158,7 +158,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <div
-      className={`bg-white text-black transition-all duration-300 ease-in-out fixed top-0 left-0 h-full ${
+      className={`bg-white text-black transition-all duration-300 ease-in-out fixed top-0 left-0 h-full pr-3 ${
         isOpen ? "w-64" : "w-14"
       } flex flex-col items-center shadow-lg`}
       style={{ zIndex: 10 }}
@@ -166,8 +166,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       {isOpen && (
         <div className="p-4 space-y-4 w-full flex flex-col h-full">
           <div className="flex flex-row space-x-4 border-b pb-4 flex-shrink-0">
-            <img src={Logo} className="h-8" alt="MIT Logo" />
-            <h2 className="text-xl font-semibold">Campus Map</h2>
+            <img src={Logo} className="h-12" alt="MapIT Logo" />
           </div>
           <div className="flex-grow overflow-y-auto">
             {renderContent()}
@@ -175,7 +174,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         </div>
       )}
 
-      <div className="absolute top-1/2 -right-4 transform -translate-y-1/2">
+      <div className="absolute top-1/2 -right-5 transform -translate-y-1/2">
         <ActionBar
           toggleSidebar={toggleSidebar}
           isOpen={isOpen}
