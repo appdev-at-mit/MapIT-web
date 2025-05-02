@@ -5,7 +5,7 @@ import Logo from "../../assets/mapit_logo.png";
 import mapboxgl from "mapbox-gl";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-  const [selectedPage, setSelectedPage] = useState("home");
+  const [selectedPage, setSelectedPage] = useState("about");
   const [currentMarker, setCurrentMarker] = useState(null);
 
   const handlePageChange = (page) => {
@@ -131,23 +131,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       case "about":
         return (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">About MapIT</h3>
+            <h3 className="text-lg font-semibold">Hello!</h3>
             <p className="text-sm">
               MapIT is a comprehensive campus navigation tool designed to help you explore and discover MIT's campus with ease.
+              Here, you can:
             </p>
             <div className="space-y-2">
-              <h4 className="text-md font-medium">Features:</h4>
               <ul className="list-disc list-inside text-sm space-y-1">
-                <li>Interactive campus map</li>
-                <li>Search for buildings and locations</li>
-                <li>Find dining options</li>
+                <li>Find buildings and classrooms</li>
+                <li>Explore dining options</li>
                 <li>Locate classrooms</li>
                 <li>Save your favorite spots</li>
                 <li>Add new locations</li>
               </ul>
             </div>
-            <p className="text-sm mt-4">
-              Built by AppDev @ MIT for MIT students, MapIT aims to make campus navigation intuitive and efficient.
+            <p className="text-sm mt-4 text-appdev-blue">
+              Built by AppDev@MIT for MIT students, MapIT aims to make campus navigation intuitive and efficient.
             </p>
           </div>
         );
