@@ -69,7 +69,7 @@ const SearchComponent = ({ onSearchResultSelect }) => {
   };
 
   return (
-    <div className="p-2 space-y-3">
+    <div className="space-y-3">
       <input
         type="text"
         placeholder="Search room (e.g., 1-136)"
@@ -86,7 +86,7 @@ const SearchComponent = ({ onSearchResultSelect }) => {
             <button
               key={index}
               onClick={() => handleResultClick(result)}
-              className="block w-full text-left p-2 rounded hover:bg-gray-200 text-sm"
+              className="block w-full text-left p-2 text-sm rounded border border-gray-300 hover:bg-appdev-purple hover:border-appdev-purple hover:text-white"
             >
               {result.buildingName ? `${result.buildingName} - ` : ""}
               {result.roomNumber} ({result.floorName})

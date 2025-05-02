@@ -12,10 +12,13 @@ const Classes = ({ onSectionSelect }) => {
         if (!subjectID){
             return;
         }
+        if (!subjectID.match(/^\d{1,2}\.\d{1,4}/)) {
+            return;
+        }
         get(`/api/class`, {subjectId: subjectID})
         .then((res) => {
             const schedule = res.schedule;
-            parseSchdule(schedule);
+            parseSchedule(schedule);
         }).catch((e) => {
             setSchedules(undefined);
             setLoadDone(true);
@@ -41,7 +44,7 @@ const Classes = ({ onSectionSelect }) => {
 
     }, [room]);
 
-    function parseSchdule(scheduleStr) {
+    function parseSchedule(scheduleStr) {
         const blocks = scheduleStr.split(';');
         const timeBlockRe = /(?<room>[\w-]+)\/(?<days>[\w-]+)\/(?<timeType>\d)\/(?<time>[\w-]+)/;
         const roomRe = /(?<building>\d+)-(?<room>\d+)/;
@@ -80,9 +83,10 @@ const Classes = ({ onSectionSelect }) => {
 
         if (!loadDone) {
             return <div className={style}>
-            { 'Loading...' }
-        </div>;
+                { 'Loading...' }
+            </div>;
         }
+
         if (schedules === undefined) {
             return <div className={style}>
                 { 'Cannot find class' }
@@ -97,33 +101,31 @@ const Classes = ({ onSectionSelect }) => {
                 let bgColor = 'bg-gray-100';
                 switch(sectionInfo.type) {
                     case "Lecture":
-                        bgColor = 'bg-green-200';
+                        bgColor = 'bg-appdev-green';
                         break;
                     case "Recitation":
-                        bgColor = 'bg-blue-200';
+                        bgColor = 'bg-appdev-blue';
                         break;
                     case "Lab":
-                        bgColor = 'bg-purple-200';
+                        bgColor = 'bg-appdev-purple';
                         break;
                     case "Design":
-                        bgColor = 'bg-pink-200';
+                        bgColor = 'bg-appdev-teal';
                         break;
                 }
                 return (
-                        <li className="border rounded mt-2 mb-2">
-                            <button onClick={() => setRoom(sectionInfo)} className="text-left w-full">
-                                <div className={`font-bold ${bgColor} pl-2`}>{sectionInfo.type}</div>
-                                <p className="p-1">
-                                    {sectionInfo.building ? `${sectionInfo.building} - ` : ""} {sectionInfo.roomNumber}
-                                <br />
-                                Meets every {sectionInfo.days} at {sectionInfo.time}<br />
-                                </p>
-                            </button>
-                        </li>
+                        <button onClick={() => setRoom(sectionInfo)} className="text-left w-full border border-gray-300 rounded mt-2 mb-2 block hover:bg-gray-200">
+                            <div className={`text-white ${bgColor} pl-2 rounded-t-sm`}>{sectionInfo.type}</div>
+                            <p className="p-1">
+                                {sectionInfo.building ? `${sectionInfo.building} - ` : ""} {sectionInfo.roomNumber}
+                            <br />
+                            Meets every {sectionInfo.days} at {sectionInfo.time}<br />
+                            </p>
+                        </button>
                     );
                 }
             );
-            return <ul>{list}</ul>
+            return <div className="">{list}</div>;
         } else {
             console.error('Something went wrong.');
             return <div className={style}>
@@ -135,24 +137,23 @@ const Classes = ({ onSectionSelect }) => {
     function handleSubjectIDQuery (e) {
         // Prevent URL from changing
         // https://react.dev/reference/react-dom/components/input#reading-the-input-values-when-submitting-a-form
-        e.preventDefault(); 
         setLoadDone(false);
         setHaveSearched(true);
-        const form = e.target;
-        const formData = new FormData(form);
-        setSubjectID(formData.get('subjectId'));
+        const newSubjectID = e.target.value.trim().toUpperCase();
+        setSubjectID(newSubjectID);
     }
 
-    return <div>
-        <p className="text-base flex">
-            <form onSubmit = {handleSubjectIDQuery} className="w-full">
-                <input type= "text" name="subjectId" className="p-2 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"/>
-                <button type="submit" className="h-full border rounded"> Search </button>
-            </form>
-        </p>
-        <div className="overflow-scroll">
-            { displaySchedule() }
-       </div>
+    return <div className="contents">
+        <input
+            type="text"
+            name="subjectId"
+            onChange={handleSubjectIDQuery}
+            className="p-2 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 w-full mt-3"
+        />
+        <div className="border-t pt-2 mt-2 flex-grow overflow-y-auto space-y-2">
+          <p className="text-xs text-gray-600 mb-1">Result:</p>
+          { displaySchedule() }
+        </div>
     </div>;
 };
 
