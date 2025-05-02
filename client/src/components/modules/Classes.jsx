@@ -149,6 +149,7 @@ const Classes = ({ onSectionSelect }) => {
             name="subjectId"
             onChange={handleSubjectIDQuery}
             className="p-2 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 w-full mt-3"
+            placeholder="Search subject (e.g., 18.02)"
         />
         <div className="border-t pt-2 mt-2 flex-grow overflow-y-auto space-y-2">
           <p className="text-xs text-gray-600 mb-1">Result:</p>
