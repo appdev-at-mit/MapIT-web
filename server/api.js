@@ -264,6 +264,36 @@ router.put("/buildings/:buildingIdentifier/floors/:floorIdentifier/details", asy
   }
 });
 
+router.get("/class", (req, res) => {
+
+  const searchText = req.query.subjectId;
+
+  const subjectNumRegex = /[a-zA-Z0-9]{1,3}.[a-zA-Z0-9]{1,4}$/;
+
+  if (!subjectNumRegex.test(searchText)) {
+      res.status(404).send({ msg: 'Class not found'});
+  } 
+
+  const baseUrl = "fireroad-dev.mit.edu";
+  fetch(`https://${baseUrl}/courses/lookup/${searchText}?full=true`)
+  .then((response) => {
+      if (response.ok) { return response.json(); }
+      else {throw new Error(`cannot retrieve class: response ${response.status}`)}
+  })
+  .then((classInfo) => {
+      if (!classInfo['schedule']) {
+          console.log(`Found ${searchText}, but no schedule`);
+          res.status(200).json({ class: searchText, schedule: '' });
+          return;
+      }
+      const scheduleStr = classInfo['schedule'];
+      res.status(200).json({ class: searchText, schedule: scheduleStr });
+      // parseSchdule(scheduleStr);
+  }).catch((e) => {
+    res.status(404).send({ msg: 'Class not found'});
+  });
+});
+
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {
   console.log(`API route not found: ${req.method} ${req.url}`);
