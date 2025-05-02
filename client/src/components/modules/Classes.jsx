@@ -6,7 +6,12 @@ const Classes = ({ onSectionSelect }) => {
     const [schedules, setSchedules] = useState([]);
     const [subjectID, setSubjectID] = useState(null);
     const [room, setRoom] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     
+    useEffect(() => {
+        setIsLoading(true);
+    }, [subjectID]);
+
     useEffect(() => {
         if (!subjectID){
             return;
@@ -14,19 +19,18 @@ const Classes = ({ onSectionSelect }) => {
 
         axios.get(`/api/class`, {params: {subjectId: subjectID}})
         .then((res) => {
-            console.log(res);
+            setIsLoading(false);
             const schedule = res.data.schedule;
-            console.log(schedule);
             parseSchdule(schedule);
         }).catch((e) => {
+            setIsLoading(false);
             setSchedules(undefined);
             console.log(e);
             console.log(`NOT FOUND for ${subjectID}`);
         });
-    }, [subjectID]);
+    }, [isLoading]);
 
     useEffect(() => {
-        console.log('room', room)
         if (room === null || room === undefined) {
             return;
         }
@@ -79,6 +83,11 @@ const Classes = ({ onSectionSelect }) => {
         const style = "text-base pt-2 pb-2"
         const header = <p className={style}>Subject Found: {subjectID}</p>
 
+        if (isLoading) {
+            return <div className={style}>
+            { 'Loading...' }
+        </div>;
+        }
         if (schedules === undefined) {
             return <div className={style}>
                 { 'Cannot find class' }
