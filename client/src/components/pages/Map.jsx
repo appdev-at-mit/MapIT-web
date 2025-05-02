@@ -101,13 +101,58 @@ const Map = () => {
             };
         });
 
+        const placeholderCoordsB6 = [
+          [-71.090838, 42.359884], // nw
+          [-71.090501, 42.359987], // ne
+          [-71.090050, 42.359274], // se
+          [-71.090406, 42.359150]  // sw
+        ];
+        const tempBuilding6Floors = [
+          { id: 'floor-0', name: 'floor 0', url: '/floor_plans/6_0.png', coordinates: placeholderCoordsB6 },
+          { id: 'floor-1', name: 'floor 1', url: '/floor_plans/6_1.png', coordinates: placeholderCoordsB6 },
+          { id: 'floor-1m', name: 'floor 1m', url: '/floor_plans/6_1M.png', coordinates: placeholderCoordsB6 },
+          { id: 'floor-2', name: 'floor 2', url: '/floor_plans/6_2.png', coordinates: placeholderCoordsB6 },
+          { id: 'floor-2m', name: 'floor 2m', url: '/floor_plans/6_2M.png', coordinates: placeholderCoordsB6 },
+          { id: 'floor-3', name: 'floor 3', url: '/floor_plans/6_3.png', coordinates: placeholderCoordsB6 },
+          { id: 'floor-4', name: 'floor 4', url: '/floor_plans/6_4.png', coordinates: placeholderCoordsB6 },
+          { id: 'floor-5', name: 'floor 5', url: '/floor_plans/6_5.png', coordinates: placeholderCoordsB6 }
+        ];
+        processedData['building-6'] = {
+            buildingIdentifier: '6',
+            name: 'building 6 (temp)',
+            floors: tempBuilding6Floors,
+            bounds: getBounds(placeholderCoordsB6)
+        };
+
+        const placeholderCoordsB6C = [
+          [-71.091051, 42.359809], // nw
+          [-71.090723, 42.359920], // ne
+          [ -71.090515, 42.359576], // se
+          [-71.090853, 42.359464]  // sw
+        ];
+        const tempBuilding6CFloors = [
+          { id: 'floor-0', name: 'floor 0', url: '/floor_plans/6C_0.png', coordinates: placeholderCoordsB6C },
+          { id: 'floor-1', name: 'floor 1', url: '/floor_plans/6C_1.png', coordinates: placeholderCoordsB6C },
+          { id: 'floor-2', name: 'floor 2', url: '/floor_plans/6C_2.png', coordinates: placeholderCoordsB6C },
+          { id: 'floor-3', name: 'floor 3', url: '/floor_plans/6C_3.png', coordinates: placeholderCoordsB6C },
+          { id: 'floor-4', name: 'floor 4', url: '/floor_plans/6C_4.png', coordinates: placeholderCoordsB6C },
+          { id: 'floor-5', name: 'floor 5', url: '/floor_plans/6C_5.png', coordinates: placeholderCoordsB6C }
+        ];
+        processedData['building-6C'] = {
+            buildingIdentifier: '6C',
+            name: 'building 6C (temp)',
+            floors: tempBuilding6CFloors,
+            bounds: getBounds(placeholderCoordsB6C)
+        };
+
         setBuildingsData(processedData);
         
         // default to the first available floor after data loads
         const firstBuildingKey = Object.keys(processedData)[0];
         const firstBuilding = processedData[firstBuildingKey];
         if (firstBuilding && firstBuilding.floors.length > 0) {
-            setActiveFloor(firstBuilding.floors[0].id);
+            // setActiveFloor(firstBuilding.floors[0].id);
+            setActiveFloor('floor-1');
         } else {
              setActiveFloor('floor-0'); // fallback if no floors found
         }

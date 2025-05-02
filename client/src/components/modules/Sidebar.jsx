@@ -170,7 +170,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <h2 className="text-xl font-semibold">Campus Map</h2>
           </div>
           <div className="flex-grow overflow-y-auto">
-            {renderContent()}
+          {renderContent()}
           </div>
         </div>
       )}
