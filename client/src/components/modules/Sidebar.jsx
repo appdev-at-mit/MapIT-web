@@ -126,7 +126,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </div>
         );
       case "classes":
-        return <Classes />;
+        return <Classes onSectionSelect={handleSearchResultSelect}/>;
       case "profile":
         return <p className="text-sm">Profile</p>;
       case "about":

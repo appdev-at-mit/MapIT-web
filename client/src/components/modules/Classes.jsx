@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
 
-const Classes = () => {
+const Classes = ({ onSectionSelect }) => {
     const [haveSearched, setHaveSearched] = useState(false);
     const [schedules, setSchedules] = useState([]);
     const [subjectID, setSubjectID] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-
+    const [room, setRoom] = useState(null);
     
     useEffect(() => {
         if (!subjectID){
@@ -26,6 +25,24 @@ const Classes = () => {
         });
     }, [subjectID]);
 
+    useEffect(() => {
+        console.log('room', room)
+        if (room === null || room === undefined) {
+            return;
+        }
+
+        const searchQuery = `${room.building}-${room.roomNumber}`;
+
+        axios.get(`/api/rooms/search/${encodeURIComponent(searchQuery)}`)
+        .then((result) => {
+            onSectionSelect(result.data);
+        })
+        .catch((e) => {
+            console.error('Search failed');
+        });
+
+    }, [room]);
+
     function parseSchdule(scheduleStr) {
         const blocks = scheduleStr.split(';');
         const timeBlockRe = /(?<room>[\w-]+)\/(?<days>[\w-]+)\/(?<timeType>\d)\/(?<time>[\w-]+)/;
@@ -39,11 +56,12 @@ const Classes = () => {
             for (const timeBlock of allTime.slice(1)) {
                 const schedule = timeBlockRe.exec(timeBlock).groups;
                 const building = roomRe.exec(schedule.room).groups.building;
+                const roomNumber = roomRe.exec(schedule.room).groups.room;
                 
                 newSchedules.push({
                     type: sectionType, 
                     building: building,
-                    room: schedule.room, 
+                    roomNumber: roomNumber, 
                     days: schedule.days,
                     time: schedule.time,
                 });
@@ -52,8 +70,6 @@ const Classes = () => {
 
         setSchedules(newSchedules);
     }
-
-
 
     function displaySchedule() {
         if (!haveSearched){
@@ -67,16 +83,12 @@ const Classes = () => {
             return <div className={style}>
                 { 'Cannot find class' }
             </div>;
-        } else if (schedules.length === undefined) {
-            return <div className={style}>
-                { 'ERROR' }
-            </div>;
         } else if (schedules.length === 0) {
             return <div>
                 {header}
                 { 'No Classes this semester' }
             </div>;
-        } else {
+        } else if (schedules.length > 0) {
             const list = schedules.map((sectionInfo) => {
                 let bgColor = 'bg-gray-100';
                 switch(sectionInfo.type) {
@@ -93,20 +105,33 @@ const Classes = () => {
                         bgColor = 'bg-pink-200';
                         break;
                 }
-                return <li className="border rounded mt-2 mb-2">
-                    <div className={`font-bold ${bgColor} pl-2`}>{sectionInfo.type}</div>
-                    <p className="p-1">{sectionInfo.room}<br />
-                    Meets on {sectionInfo.days} at {sectionInfo.time}<br />
-                    </p>
-                </li>;
+                return (
+                        <li className="border rounded mt-2 mb-2">
+                            <button onClick={() => setRoom(sectionInfo)} className="text-left w-full">
+                                <div className={`font-bold ${bgColor} pl-2`}>{sectionInfo.type}</div>
+                                <p className="p-1">
+                                    {sectionInfo.building ? `${sectionInfo.building} - ` : ""} {sectionInfo.roomNumber}
+                                <br />
+                                Meets every {sectionInfo.days} at {sectionInfo.time}<br />
+                                </p>
+                            </button>
+                        </li>
+                    );
                 }
             );
             return <ul>{list}</ul>
-        }
+        } else {
+            console.error('Something went wrong.');
+            return <div className={style}>
+                { '' }
+            </div>;
+        } 
     }
 
     function handleSubjectIDQuery (e) {
-        e.preventDefault(); // https://react.dev/reference/react-dom/components/input#reading-the-input-values-when-submitting-a-form
+        // Prevent URL from changing
+        // https://react.dev/reference/react-dom/components/input#reading-the-input-values-when-submitting-a-form
+        e.preventDefault(); 
         setHaveSearched(true);
         const form = e.target;
         const formData = new FormData(form);
