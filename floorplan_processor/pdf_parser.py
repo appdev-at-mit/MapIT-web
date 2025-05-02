@@ -125,30 +125,38 @@ def extract_building_contour(image):
     # add alpha channel
     image = cv2.cvtColor(image, cv2.COLOR_BGR2BGRA)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    edges = cv2.Canny(blurred, 50, 150)
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    #blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+    morph = cv2.dilate(thresh, kernel=np.ones((30, 30), np.uint8))
+    morph = cv2.erode(morph, kernel=np.ones((15, 15), np.uint8))
+    cv2.imwrite("morph.png", morph)
+    # edges = cv2.Canny(morph, 50, 150)
+    # cv2.imwrite("edges.png", edges)
+    contours, _ = cv2.findContours(morph, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     ret = []
     contours = sorted(contours, key=cv2.contourArea, reverse=True)
+    full_contours = []
     for contour in contours:
         if cv2.contourArea(contour) > 1000:
-            contour = fix_contour(contour, image)
+            full_contours.append(contour)
+            break
+    full_contour = np.vstack(full_contours)
+    contour = full_contour#fix_contour(full_contour, image)
 
-            mask = np.zeros(image.shape, dtype=np.uint8)
-            cv2.drawContours(mask, [contour], -1, (255, 255, 255, 255), -1)
-            mask = cv2.bitwise_and(image, mask)
-            x, y, w, h = cv2.boundingRect(contour)
-            cropped = mask[y : y + h, x : x + w]
+    mask = np.zeros(image.shape, dtype=np.uint8)
+    cv2.drawContours(mask, [contour], -1, (255, 255, 255, 255), -1)
+    mask = cv2.bitwise_and(image, mask)
+    x, y, w, h = cv2.boundingRect(contour)
+    cropped = mask[y : y + h, x : x + w]
 
-            # postprocess image
-            kernel = np.ones((3, 3), np.uint8)
-            cropped = cv2.erode(cropped, kernel, iterations=1)
-            black_mask = cv2.inRange(cropped, (0, 0, 0, 255), (200, 200, 200, 255))
-            cropped[black_mask > 0] = BLACK
+    # postprocess image
+    kernel = np.ones((3, 3), np.uint8)
+    cropped = cv2.erode(cropped, kernel, iterations=1)
+    black_mask = cv2.inRange(cropped, (0, 0, 0, 255), (200, 200, 200, 255))
+    cropped[black_mask > 0] = BLACK
 
-            return cropped
-    return None
+    return cropped
 
 
 def fix_contour(contour, img):
@@ -156,7 +164,17 @@ def fix_contour(contour, img):
     # take the convex hull, and figure out where to break it
     # metric: distance / number of points skipped, lower metric better
     # print("Contour: ", contour)
+
+    # rearrange contour to run clockwise from center mass
+    # cm = np.mean(contour, axis=0)[0]
+    # contour = sorted(contour, key=lambda x: np.arctan2(x[0][1] - cm[1], x[0][0] - cm[0]))
+    # # filter points too close to the center
+    # contour = [point for point in contour if np.linalg.norm(point[0] - cm) > 100]
+    # contour = np.array(contour)
+    
     hull = cv2.convexHull(contour, returnPoints=False)
+    # return hull
+
     # print("Hull: ", hull)
     try:
         defects = cv2.convexityDefects(contour, hull)
@@ -188,16 +206,16 @@ def fix_contour(contour, img):
             metric = distance / area
             #print("Distance:", distance, "Perim:", perim)
             print(metric)
-            if metric < 0.1:
+            if metric < 0.01:
                 cur = e
             else:
                 cur += 1
         else:
             cur += 1
     #img = cv2.resize(img, (0, 0), fx=0.2, fy=0.2)
-    cv2.imshow("contour", img)
-    cv2.imwrite("contour.png", img)
-    cv2.waitKey(0)
+    # cv2.imshow("contour", img)
+    # cv2.imwrite("contour.png", img)
+    # cv2.waitKey(0)
     fixed_contour = np.array(fixed_contour)
     return fixed_contour
 
@@ -257,24 +275,31 @@ def rotate_image(mat, angle):
     rotated_mat = cv2.warpAffine(mat, rotation_mat, (bound_w, bound_h))
     return rotated_mat
 
+m = {}
 def run_file(fname):
     img = render_pdf(fname)[0]
     img = np.array(img)
     sections = extract_outer_rect_contour(img)
-    floorplan = extract_building_contour(sections[FLOORPLAN_CONTOUR_INDEX])
-    # heading = extract_heading(sections[HEADING_CONTOUR_INDEX])
+    # floorplan = extract_building_contour(sections[FLOORPLAN_CONTOUR_INDEX])
+    heading = extract_heading(sections[HEADING_CONTOUR_INDEX])
     # floorplan = rotate_image(floorplan, 90 - heading)
-    # print("Heading:", heading)
-    print("contours/" + fname.split(".")[0].split("/")[1] + ".png")
-    cv2.imwrite("contours/" + fname.split(".")[0].split("/")[1] + ".png", floorplan)
+    print("Heading:", heading)
+    m[fname.split("_")[0].split("/")[1]] = heading
+    # print("contours/" + fname.split(".")[0].split("/")[1] + ".png")
+    # cv2.imwrite("contours/" + fname.split(".")[0].split("/")[1] + ".png", floorplan)
     # cv2.imwrite("heading_img.png", sections[HEADING_CONTOUR_INDEX])
     # cv2.waitKey(0)
 
 for fname in tqdm(os.listdir("floorplans")):
     if fname.endswith(".pdf"):
+        if fname.split("_")[0] in m:
+            continue
         run_file("floorplans/" + fname)
+import json
+with open("orientations.json", "w") as f:
+    json.dump(m, f, indent=4)
 
-run_file("floorplans/13_4.pdf")
+# run_file("floorplans/2_0.pdf")
 
 # if __name__ == "__main__":
 #     img = render_pdf("1_1.pdf")[0]
