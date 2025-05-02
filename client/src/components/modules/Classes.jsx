@@ -6,29 +6,23 @@ const Classes = ({ onSectionSelect }) => {
     const [schedules, setSchedules] = useState([]);
     const [subjectID, setSubjectID] = useState(null);
     const [room, setRoom] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    
-    useEffect(() => {
-        setIsLoading(true);
-    }, [subjectID]);
+    const [loadDone, setLoadDone] = useState(true);
 
     useEffect(() => {
         if (!subjectID){
             return;
         }
-
         axios.get(`/api/class`, {params: {subjectId: subjectID}})
         .then((res) => {
-            setIsLoading(false);
             const schedule = res.data.schedule;
             parseSchdule(schedule);
         }).catch((e) => {
-            setIsLoading(false);
             setSchedules(undefined);
+            setLoadDone(true);
             console.log(e);
             console.log(`NOT FOUND for ${subjectID}`);
         });
-    }, [isLoading]);
+    }, [subjectID]);
 
     useEffect(() => {
         if (room === null || room === undefined) {
@@ -73,6 +67,7 @@ const Classes = ({ onSectionSelect }) => {
         })
 
         setSchedules(newSchedules);
+        setLoadDone(true);
     }
 
     function displaySchedule() {
@@ -83,7 +78,7 @@ const Classes = ({ onSectionSelect }) => {
         const style = "text-base pt-2 pb-2"
         const header = <p className={style}>Subject Found: {subjectID}</p>
 
-        if (isLoading) {
+        if (!loadDone) {
             return <div className={style}>
             { 'Loading...' }
         </div>;
@@ -141,6 +136,7 @@ const Classes = ({ onSectionSelect }) => {
         // Prevent URL from changing
         // https://react.dev/reference/react-dom/components/input#reading-the-input-values-when-submitting-a-form
         e.preventDefault(); 
+        setLoadDone(false);
         setHaveSearched(true);
         const form = e.target;
         const formData = new FormData(form);
