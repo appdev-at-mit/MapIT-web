@@ -15,7 +15,7 @@ import {
 
 const ActionBar = ({ toggleSidebar, isOpen, onPageChange }) => {
   return (
-    <div className="flex flex-col items-center space-y-6 bg-appdev-blue p-2 rounded-lg shadow-md">
+    <div className="flex flex-col items-center space-y-6 bg-appdev-blue p-2 rounded-lg shadow-md shadow-appdev-blue">
       <FontAwesomeIcon
         icon={faUser}
         className="w-6 h-6 text-white cursor-pointer"

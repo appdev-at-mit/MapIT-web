@@ -3,6 +3,7 @@ import ActionBar from "./ActionBar";
 import SearchComponent from "./SearchComponent";
 import Logo from "../../assets/mapit_logo.png";
 import mapboxgl from "mapbox-gl";
+import Classes from "./Classes";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [selectedPage, setSelectedPage] = useState("about");
@@ -96,8 +97,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         return <p className="text-sm">Add new location</p>;
       case "dining":
         return (
-          <div className="flex flex-col space-y-2 text-sm">
-            <p className="text-sm">Dining Locations:</p>
+          <div className="space-y-2 text-sm contents">
+            <p className="pt-2 pb-1 text-appdev-blue font-bold">Dining Locations</p>
+            <div className="flex flex-col space-y-2 flex-grow overflow-y-auto">
             {foodSpots.map((loc, idx) => (
               <button
                 key={idx}
@@ -107,12 +109,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 {loc.name}
               </button>
             ))}
+            </div>
           </div>
         );
       case "study":
         return (
-          <div className="flex flex-col space-y-2 text-sm">
-            <p className="text-sm">Study Spots:</p>
+          <div className="space-y-2 text-sm contents">
+            <p className="pt-2 pb-1 text-appdev-blue font-bold">Study Spots</p>
+            <div className="flex-grow overflow-y-auto flex flex-col space-y-2">
             {studySpots.map((loc, idx) => (
               <button
                 key={idx}
@@ -122,15 +126,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 {loc.name}
               </button>
             ))}
+            </div>
           </div>
         );
       case "classes":
-        return <p className="text-sm">Classes</p>;
+        return <Classes onSectionSelect={handleSearchResultSelect}/>;
       case "profile":
         return <p className="text-sm">Profile</p>;
       case "about":
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 flex-grow overflow-y-auto">
             <h3 className="text-lg font-semibold">Hello!</h3>
             <p className="text-sm">
               MapIT is a comprehensive campus navigation tool designed to help you explore and discover MIT's campus with ease.
@@ -157,7 +162,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <div
-      className={`bg-white text-black transition-all duration-300 ease-in-out fixed top-0 left-0 h-full pr-3 ${
+      className={`bg-white text-black transition-all duration-300 ease-in-out fixed top-0 left-0 h-full pr-3 shadow-appdev-purple shadow-lg ${
         isOpen ? "w-64" : "w-14"
       } flex flex-col items-center shadow-lg`}
       style={{ zIndex: 10 }}
