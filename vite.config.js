@@ -12,19 +12,31 @@ export default defineConfig(({ mode }) => {
     plugins: [react(), svgr()],
     root: path.resolve(__dirname, 'client'),
     envDir: path.resolve(__dirname),
+    base: isProduction ? '/assets/' : '/',
     build: {
       outDir: path.resolve(__dirname, 'client/dist'),
       assetsDir: 'assets',
       emptyOutDir: true,
-      sourcemap: !isProduction,
-      minify: isProduction,
+      sourcemap: false,
+      minify: true,
       manifest: true,
       rollupOptions: {
         output: {
           manualChunks: {
-            vendor: ['react', 'react-dom', 'react-router-dom'],
-            utils: ['axios', 'jwt-decode']
-          }
+            vendor: ['react', 'react-dom', 'react-router-dom']
+          },
+          assetFileNames: (assetInfo) => {
+            const extType = assetInfo.name.split('.').at(1);
+            if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+              return `images/[name]-[hash][extname]`;
+            }
+            if (/woff|woff2|eot|ttf|otf/i.test(extType)) {
+              return `fonts/[name]-[hash][extname]`;
+            }
+            return `assets/[name]-[hash][extname]`;
+          },
+          chunkFileNames: 'js/[name]-[hash].js',
+          entryFileNames: 'js/[name]-[hash].js'
         }
       }
     },

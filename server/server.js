@@ -61,8 +61,7 @@ app.use(express.json());
 // set up a session, which will persist login data across requests
 app.use(
   session({
-    // TODO: add a SESSION_SECRET string in your .env file, and replace the secret with process.env.SESSION_SECRET
-    secret: "session-secret",
+    secret: process.env.SESSION_SECRET || "session-secret",
     resave: false,
     saveUninitialized: false,
   })
@@ -104,11 +103,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// hardcode port to 3000 for now
-const port = 3000;
+// use port from environment variable or default to 3000
+const port = process.env.PORT || 3000;
 const server = http.Server(app);
 socketManager.init(server);
 
 server.listen(port, () => {
   console.log(`Server running on port: ${port}`);
+  console.log(`Mode: ${process.env.NODE_ENV || "development"}`);
 });
