@@ -101,49 +101,54 @@ const Map = () => {
             };
         });
 
-        const placeholderCoordsB6 = [
-          [-71.090838, 42.359884], // nw
-          [-71.090501, 42.359987], // ne
-          [-71.090050, 42.359274], // se
-          [-71.090406, 42.359150]  // sw
+        // ---- TEMPORARY ADDITION FOR BUILDING 7 COORDINATE FINDING ----
+        const placeholderCoordsB7 = [
+          [-71.093594, 42.359542], // nw (Slightly offset from B7)
+          [-71.093028, 42.359714], // ne
+          [-71.092661, 42.359135], // se
+          [-71.093265, 42.358982]  // sw
         ];
-        const tempBuilding6Floors = [
-          { id: 'floor-0', name: 'floor 0', url: '/floor_plans/6_0.png', coordinates: placeholderCoordsB6 },
-          { id: 'floor-1', name: 'floor 1', url: '/floor_plans/6_1.png', coordinates: placeholderCoordsB6 },
-          { id: 'floor-1m', name: 'floor 1m', url: '/floor_plans/6_1M.png', coordinates: placeholderCoordsB6 },
-          { id: 'floor-2', name: 'floor 2', url: '/floor_plans/6_2.png', coordinates: placeholderCoordsB6 },
-          { id: 'floor-2m', name: 'floor 2m', url: '/floor_plans/6_2M.png', coordinates: placeholderCoordsB6 },
-          { id: 'floor-3', name: 'floor 3', url: '/floor_plans/6_3.png', coordinates: placeholderCoordsB6 },
-          { id: 'floor-4', name: 'floor 4', url: '/floor_plans/6_4.png', coordinates: placeholderCoordsB6 },
-          { id: 'floor-5', name: 'floor 5', url: '/floor_plans/6_5.png', coordinates: placeholderCoordsB6 }
+        const tempBuilding7Floors = [
+          { id: 'floor-0', name: 'Floor 0', url: '/floor_plans/7_0.png', coordinates: placeholderCoordsB7 },
+          { id: 'floor-1', name: 'Floor 1', url: '/floor_plans/7_1.png', coordinates: placeholderCoordsB7 },
+          { id: 'floor-2', name: 'Floor 2', url: '/floor_plans/7_2.png', coordinates: placeholderCoordsB7 },
+          { id: 'floor-2m', name: 'Floor 2M', url: '/floor_plans/7_2M.png', coordinates: placeholderCoordsB7 },
+          { id: 'floor-3', name: 'Floor 3', url: '/floor_plans/7_3.png', coordinates: placeholderCoordsB7 },
+          { id: 'floor-4', name: 'Floor 4', url: '/floor_plans/7_4.png', coordinates: placeholderCoordsB7 },
+          { id: 'floor-4m', name: 'Floor 4M', url: '/floor_plans/7_4M.png', coordinates: placeholderCoordsB7 },
+          { id: 'floor-5', name: 'Floor 5', url: '/floor_plans/7_5.png', coordinates: placeholderCoordsB7 },
+          { id: 'floor-6', name: 'Floor 6', url: '/floor_plans/7_6.png', coordinates: placeholderCoordsB7 }
         ];
-        processedData['building-6'] = {
-            buildingIdentifier: '6',
-            name: 'building 6 (temp)',
-            floors: tempBuilding6Floors,
-            bounds: getBounds(placeholderCoordsB6)
+        processedData['building-7'] = {
+            buildingIdentifier: '7',
+            name: 'Building 7 (temp)',
+            floors: tempBuilding7Floors,
+            bounds: getBounds(placeholderCoordsB7)
         };
 
-        const placeholderCoordsB6C = [
-          [-71.091051, 42.359809], // nw
-          [-71.090723, 42.359920], // ne
-          [ -71.090515, 42.359576], // se
-          [-71.090853, 42.359464]  // sw
+        /* ---- TEMPORARY ADDITION FOR BUILDING 7A COORDINATE FINDING ----
+        const placeholderCoordsB7A = [
+          [-71.0906, 42.3600], // nw (Slightly offset from B7)
+          [-71.0903, 42.3601], // ne
+          [-71.0901, 42.3594], // se
+          [-71.0904, 42.3593]  // sw
         ];
-        const tempBuilding6CFloors = [
-          { id: 'floor-0', name: 'floor 0', url: '/floor_plans/6C_0.png', coordinates: placeholderCoordsB6C },
-          { id: 'floor-1', name: 'floor 1', url: '/floor_plans/6C_1.png', coordinates: placeholderCoordsB6C },
-          { id: 'floor-2', name: 'floor 2', url: '/floor_plans/6C_2.png', coordinates: placeholderCoordsB6C },
-          { id: 'floor-3', name: 'floor 3', url: '/floor_plans/6C_3.png', coordinates: placeholderCoordsB6C },
-          { id: 'floor-4', name: 'floor 4', url: '/floor_plans/6C_4.png', coordinates: placeholderCoordsB6C },
-          { id: 'floor-5', name: 'floor 5', url: '/floor_plans/6C_5.png', coordinates: placeholderCoordsB6C }
+        const tempBuilding7AFloors = [
+          { id: 'floor-0', name: 'Floor 0', url: '/floor_plans/7A_0.png', coordinates: placeholderCoordsB7A },
+          { id: 'floor-1', name: 'Floor 1', url: '/floor_plans/7A_1.png', coordinates: placeholderCoordsB7A },
+          { id: 'floor-2', name: 'Floor 2', url: '/floor_plans/7A_2.png', coordinates: placeholderCoordsB7A },
+          { id: 'floor-3', name: 'Floor 3', url: '/floor_plans/7A_3.png', coordinates: placeholderCoordsB7A },
+          { id: 'floor-4', name: 'Floor 4', url: '/floor_plans/7A_4.png', coordinates: placeholderCoordsB7A },
+          { id: 'floor-5', name: 'Floor 5', url: '/floor_plans/7A_5.png', coordinates: placeholderCoordsB7A },
+          { id: 'floor-6', name: 'Floor 6', url: '/floor_plans/7A_6.png', coordinates: placeholderCoordsB7A }
         ];
-        processedData['building-6C'] = {
-            buildingIdentifier: '6C',
-            name: 'building 6C (temp)',
-            floors: tempBuilding6CFloors,
-            bounds: getBounds(placeholderCoordsB6C)
+        processedData['building-7A'] = {
+            buildingIdentifier: '7A',
+            name: 'Building 7A (temp)',
+            floors: tempBuilding7AFloors,
+            bounds: getBounds(placeholderCoordsB7A)
         };
+        */
 
         setBuildingsData(processedData);
         
@@ -210,8 +215,8 @@ const Map = () => {
         map.addControl(new mapboxgl.GeolocateControl({ /* options */ }));
 
         // map click handler - primarily for coordinate logging/copying currently
-        const handleMapClick = (e) => {
-            const { lng, lat } = e.lngLat;
+    const handleMapClick = (e) => {
+      const { lng, lat } = e.lngLat;
             if (popupRef.current) { popupRef.current.remove(); popupRef.current = null; }
             const activeFloorId = currentFloorIdRef.current;
             let clickedBuildingKey = null;
@@ -296,15 +301,15 @@ const Map = () => {
    // ensures map instance is properly removed on component unmount
    useEffect(() => {  
      const map = mapRef.current;
-     return () => {
+    return () => {
          if (map) {
              // todo: need to store and remove the specific handleMapClick listener
              map.remove();
              mapRef.current = null; 
              window.mapboxMap = null;
-         }
-     };
-   }, []);
+      }
+    };
+  }, []);
 
   if (isLoading) {
     return <div className="w-full h-full flex items-center justify-center">loading map data...</div>;
@@ -313,7 +318,7 @@ const Map = () => {
   if (error) {
     return <div className="w-full h-full flex items-center justify-center text-red-600">error: {error}</div>;
   }
-  
+
   return (
     <div className="relative w-full h-full">
       {/* inject css for popup styling */}
@@ -326,7 +331,7 @@ const Map = () => {
         }
       `}</style>
       {/* todo: need ui (e.g., in sidebar) to call setactivefloor */} 
-      <div ref={mapContainerRef} className="w-full h-full absolute inset-0" />
+    <div ref={mapContainerRef} className="w-full h-full absolute inset-0" />
     </div>
   );
 };
