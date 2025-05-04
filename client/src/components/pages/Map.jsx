@@ -4,8 +4,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { get } from "../../utilities";
 
-mapboxgl.accessToken =
-  "pk.eyJ1IjoiaGFpbGV5cGFuIiwiYSI6ImNtMmk1aTAzdTBqaXgya3EzczBuOTU0b3QifQ.Vfmnzm0EW8Z-3Dp3PhE8Aw";
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 // calculates a simple rectangular bounding box from the corner coordinates
 function getBounds(coordinates) {
@@ -206,7 +205,7 @@ const Map = () => {
     if (!mapRef.current) {
         const map = new mapboxgl.Map({
             container: mapContainerRef.current,
-            style: "mapbox://styles/jieruei/cma66vw7o002v01sb57tg3qdo",
+            style: import.meta.env.VITE_MAPBOX_STYLE_URL,
             center: [-71.0915, 42.3586],
             zoom: 16.5,
         });
