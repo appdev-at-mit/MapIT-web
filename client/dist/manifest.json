@@ -1,0 +1,35 @@
+{
+  "_utils-9c18df67.js": {
+    "file": "assets/utils-9c18df67.js"
+  },
+  "_vendor-d2bb6004.js": {
+    "file": "assets/vendor-d2bb6004.js"
+  },
+  "favicon.png": {
+    "file": "assets/favicon-4ce51d8e.png",
+    "src": "favicon.png"
+  },
+  "index.css": {
+    "file": "assets/index-dd9af885.css",
+    "src": "index.css"
+  },
+  "index.html": {
+    "assets": [
+      "assets/mapit_logo-a938eff6.png"
+    ],
+    "css": [
+      "assets/index-dd9af885.css"
+    ],
+    "file": "assets/index-fb8d2378.js",
+    "imports": [
+      "_vendor-d2bb6004.js",
+      "_utils-9c18df67.js"
+    ],
+    "isEntry": true,
+    "src": "index.html"
+  },
+  "src/assets/mapit_logo.png": {
+    "file": "assets/mapit_logo-a938eff6.png",
+    "src": "src/assets/mapit_logo.png"
+  }
+}
