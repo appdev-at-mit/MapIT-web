@@ -32,7 +32,7 @@ function checkHotLoader() {
 
 module.exports = {
   checkSetup: () => {
-    if (!fs.existsSync("./node_modules/")) {
+    if (!fs.existsSync("../node_modules/")) {
       throw new NodeSetupError(
         "node_modules not found! This probably means you forgot to run 'npm install'"
       );
